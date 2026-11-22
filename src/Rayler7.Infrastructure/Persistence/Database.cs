@@ -150,5 +150,31 @@ public static class Migrations
             );
             ALTER TABLE projects ADD COLUMN mapping_confirmed INTEGER NOT NULL DEFAULT 0;
             """),
+        new(3, "extracao", """
+            ALTER TABLE project_files ADD COLUMN status TEXT NOT NULL DEFAULT 'fila';
+            ALTER TABLE project_files ADD COLUMN status_message TEXT NULL;
+            CREATE TABLE extracted_records(
+                id TEXT PRIMARY KEY,
+                project_id TEXT NOT NULL REFERENCES projects(id),
+                file_id TEXT NULL,
+                source_file TEXT NOT NULL,
+                page INTEGER NULL,
+                row_number INTEGER NULL,
+                source_col TEXT NULL,
+                target_col TEXT NULL,
+                field TEXT NOT NULL,
+                original TEXT NOT NULL,
+                confidence REAL NULL,
+                doubts_json TEXT NOT NULL,
+                status TEXT NOT NULL,
+                corrected TEXT NULL,
+                leave_empty INTEGER NOT NULL DEFAULT 0,
+                selected INTEGER NOT NULL DEFAULT 0,
+                seq INTEGER NOT NULL
+            );
+            CREATE INDEX ix_records_project ON extracted_records(project_id, seq);
+            ALTER TABLE projects ADD COLUMN conference_confirmed INTEGER NOT NULL DEFAULT 0;
+            ALTER TABLE projects ADD COLUMN filled_path TEXT NULL;
+            """),
     ];
 }

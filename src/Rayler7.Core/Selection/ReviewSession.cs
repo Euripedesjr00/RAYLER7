@@ -71,6 +71,8 @@ public sealed class ReviewSession
 
     public bool IsSelected(Guid id) => _selected.Contains(id);
 
+    public IReadOnlySet<Guid> SelectedIds => _selected;
+
     public void Select(Guid id)
     {
         var r = Get(id);

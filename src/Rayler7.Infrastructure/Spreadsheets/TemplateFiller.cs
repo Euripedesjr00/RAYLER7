@@ -48,6 +48,8 @@ public static class TemplateFiller
 
         var before = FileHash.Sha256(templatePath);
         File.Copy(templatePath, outputPath, overwrite: false);
+        // A cópia guardada do modelo é somente-leitura; a cópia de trabalho precisa ser gravável.
+        File.SetAttributes(outputPath, File.GetAttributes(outputPath) & ~FileAttributes.ReadOnly);
 
         var conflicts = new List<FillConflict>();
         var warnings = new List<string>();

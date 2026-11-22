@@ -13,6 +13,7 @@
             <DataTemplate DataType="{x:Type vm:LoginViewModel}"><v:LoginView /></DataTemplate>
             <DataTemplate DataType="{x:Type vm:CoverViewModel}"><v:CoverView /></DataTemplate>
             <DataTemplate DataType="{x:Type vm:Stage1ViewModel}"><v:Stage1View /></DataTemplate>
+            <DataTemplate DataType="{x:Type vm:Stage2ViewModel}"><v:Stage2View /></DataTemplate>
             <DataTemplate DataType="{x:Type vm:PendingStageViewModel}"><v:PendingStageView /></DataTemplate>
         </ResourceDictionary>
     </Application.Resources>

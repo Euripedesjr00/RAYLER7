@@ -103,10 +103,7 @@ public sealed partial class MainViewModel : ObservableObject
         }
 
         Stage = AppStage.Stage2;
-        CurrentPage = new PendingStageViewModel(
-            "Etapa 2 de 3",
-            "ETAPA 2 – ENVIO E EXTRAÇÃO DOS DADOS",
-            "Esta etapa está em desenvolvimento e ainda não processa arquivos. Nada nesta tela simula resultados.");
+        CurrentPage = new Stage2ViewModel(_services, _dialogs, this, Workspace!);
         OnPropertyChanged(nameof(ShowProjectBar));
     }
 
@@ -122,7 +119,7 @@ public sealed partial class MainViewModel : ObservableObject
         CurrentPage = new PendingStageViewModel(
             "Etapa 3 de 3",
             "ETAPA 3 – PERSONALIZAÇÃO E EXPORTAÇÃO",
-            "Esta etapa está em desenvolvimento. Nenhum arquivo é gerado aqui por enquanto.");
+            "A planilha preenchida já é gerada ao confirmar a Etapa 2 (pasta \"trabalho\" do projeto). A personalização visual e a exportação em outros formatos estão em desenvolvimento.");
         OnPropertyChanged(nameof(ShowProjectBar));
     }
 
@@ -187,6 +184,7 @@ public sealed partial class MainViewModel : ObservableObject
             ws.Stage1Confirmed = template is not null;
         }
 
+        ws.ConferenceConfirmed = _services.Projects.GetConference(p.Id).Confirmed;
         OpenWorkspace(ws);
         Status($"Projeto aberto: {p.Name}");
     }

@@ -49,6 +49,14 @@ public sealed class ExtractedRecord
 
     public bool HasOpenDoubt => Status == RecordStatus.Doubtful;
 
+    /// <summary>Usado somente ao recarregar do banco um estado já auditado.</summary>
+    public void RestoreState(RecordStatus status, string? correctedText, bool leaveEmpty)
+    {
+        Status = status;
+        CorrectedText = correctedText;
+        LeaveEmpty = leaveEmpty;
+    }
+
     public void ConfirmAsIdentified(string user, Guid projectId, IAuditLog audit)
     {
         Require(user, audit);

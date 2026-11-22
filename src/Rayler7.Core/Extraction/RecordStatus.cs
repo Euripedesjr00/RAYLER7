@@ -23,6 +23,8 @@ public enum DoubtKind
     AmbiguousSeparator,
     DecimalPlacesMismatch,
     Illegible,
+    NoTargetColumn,
+    RowShape,
 }
 
 /// <summary>Dúvida identificada na extração. O sistema nunca a resolve sozinho.</summary>

@@ -1,13 +1,13 @@
-Interface WPF: login, capa, Etapa 1 e mapeamento persistente
+Etapa 2: extracao de arquivos digitais, revisao, duvidas e conferencia final
 
-- Layout fiel ao app de referencia (slate/emerald, cabecalho com bandeiras vetoriais)
-- Primeira execucao cria administrador local; login com bloqueio progressivo
-- Capa com projetos recentes e "Continuar projeto" (mapeamento recarregado)
-- Etapa 1: analise do modelo, previa, instrucoes interpretadas sem IA, mapeamento travavel
-- Etapas 2 e 3 identificadas como pendentes (sem simulacao)
-- Correcoes apos teste real no Windows 11: janela cabe na tela, titulo mesclado
-  nao vira cabecalho, formulas visiveis na previa, rolagem sobre tabelas, rotulos em PT-BR
-- RAYLER7_DATA permite testar numa pasta separada dos dados reais
+- Leitura sem OCR e sem IA: Excel, CSV/TSV/TXT, Word (tabelas) e PDF com texto digital
+- Matriz de suporte real: imagens e .xls/.ods ficam como "Pendente", sem simular resultado
+- Registros com origem completa (arquivo, pagina, linha, coluna) persistidos no SQLite
+- Selecionar todos os dados em todas as paginas; escopo explicito com filtro ativo
+- Painel de duvidas: confirmar, usar alternativa, corrigir, deixar vazio ou rejeitar
+- Conferencia final bloqueia duvidas abertas sem autorizacao explicita
+- Gera planilha preenchida como copia (XLSX ou CSV); hash do modelo verificado
+- 99 testes automatizados
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01MYFPrFXy4xzXfnS4QkZVoH

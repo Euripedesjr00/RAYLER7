@@ -15,7 +15,8 @@ public sealed record ProjectInfo(
     DateTimeOffset CreatedAt,
     DateTimeOffset ModifiedAt);
 
-public sealed record ProjectFile(Guid Id, Guid ProjectId, string Role, string OriginalName, string StoredPath, string Sha256, DateTimeOffset AddedAt);
+public sealed record ProjectFile(Guid Id, Guid ProjectId, string Role, string OriginalName, string StoredPath, string Sha256, DateTimeOffset AddedAt,
+    string Status = "fila", string? StatusMessage = null);
 
 /// <summary>
 /// Projetos ficam no banco local + uma pasta própria em %LOCALAPPDATA%\RAYLER7\projetos\{id}.
@@ -114,7 +115,7 @@ public sealed class ProjectService(Database db, string projectsRoot)
     {
         using var c = db.Open();
         using var cmd = c.CreateCommand();
-        cmd.CommandText = "SELECT id, role, original_name, stored_path, sha256, added_at FROM project_files WHERE project_id = $p"
+        cmd.CommandText = "SELECT id, role, original_name, stored_path, sha256, added_at, status, status_message FROM project_files WHERE project_id = $p"
                           + (role is null ? string.Empty : " AND role = $r") + " ORDER BY added_at";
         cmd.Parameters.AddWithValue("$p", projectId.ToString());
         if (role is not null)
@@ -127,10 +128,32 @@ public sealed class ProjectService(Database db, string projectsRoot)
         while (r.Read())
         {
             list.Add(new ProjectFile(Guid.Parse(r.GetString(0)), projectId, r.GetString(1), r.GetString(2), r.GetString(3), r.GetString(4),
-                DateTimeOffset.Parse(r.GetString(5), CultureInfo.InvariantCulture)));
+                DateTimeOffset.Parse(r.GetString(5), CultureInfo.InvariantCulture), r.GetString(6), r.IsDBNull(7) ? null : r.GetString(7)));
         }
 
         return list;
+    }
+
+    public void SetFileStatus(Guid fileId, string status, string? message) =>
+        Exec("UPDATE project_files SET status = $s, status_message = $m WHERE id = $id",
+            ("$s", status), ("$m", message), ("$id", fileId.ToString()));
+
+    /// <summary>Retira o arquivo da fila do projeto (a cópia guardada é mantida para auditoria).</summary>
+    public void RemoveFromQueue(Guid fileId) =>
+        Exec("UPDATE project_files SET role = 'removido' WHERE id = $id", ("$id", fileId.ToString()));
+
+    public void SetConference(Guid projectId, bool confirmed, string? filledPath) =>
+        Exec("UPDATE projects SET conference_confirmed = $c, filled_path = $f, modified_at = $t WHERE id = $id",
+            ("$c", confirmed ? 1 : 0), ("$f", filledPath), ("$t", Iso(DateTimeOffset.UtcNow)), ("$id", projectId.ToString()));
+
+    public (bool Confirmed, string? FilledPath) GetConference(Guid projectId)
+    {
+        using var c = db.Open();
+        using var cmd = c.CreateCommand();
+        cmd.CommandText = "SELECT conference_confirmed, filled_path FROM projects WHERE id = $id";
+        cmd.Parameters.AddWithValue("$id", projectId.ToString());
+        using var r = cmd.ExecuteReader();
+        return r.Read() ? (r.GetInt64(0) == 1, r.IsDBNull(1) ? null : r.GetString(1)) : (false, null);
     }
 
     /// <summary>Confere se os arquivos guardados continuam íntegros (hash).</summary>
