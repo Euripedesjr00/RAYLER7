@@ -1,0 +1,21 @@
+<UserControl x:Class="Rayler7.App.Controls.BrazilFlag"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             AutomationProperties.Name="Bandeira do Brasil" SnapsToDevicePixels="True">
+    <!-- Desenho vetorial: bandeiras em emoji não aparecem no Windows -->
+    <Border BorderBrush="#1A000000" BorderThickness="0.5" CornerRadius="2" ClipToBounds="True">
+        <Viewbox Stretch="Uniform">
+            <Canvas Width="20" Height="14">
+                <Rectangle Width="20" Height="14" Fill="#009C3B" />
+                <Polygon Points="10,1.7 18.3,7 10,12.3 1.7,7" Fill="#FFDF00" />
+                <Ellipse Canvas.Left="6.5" Canvas.Top="3.5" Width="7" Height="7" Fill="#002776" />
+                <Path Data="M 6.65 6.45 A 5.8 5.8 0 0 1 13.4 7.75" Stroke="White" StrokeThickness="0.55" />
+                <Ellipse Canvas.Left="8.58" Canvas.Top="5.48" Width="0.44" Height="0.44" Fill="White" />
+                <Ellipse Canvas.Left="9.96" Canvas.Top="7.96" Width="0.48" Height="0.48" Fill="White" />
+                <Ellipse Canvas.Left="9.22" Canvas.Top="8.42" Width="0.36" Height="0.36" Fill="White" />
+                <Ellipse Canvas.Left="10.92" Canvas.Top="8.32" Width="0.36" Height="0.36" Fill="White" />
+                <Ellipse Canvas.Left="9.8" Canvas.Top="7.4" Width="0.4" Height="0.4" Fill="White" />
+            </Canvas>
+        </Viewbox>
+    </Border>
+</UserControl>

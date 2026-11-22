@@ -49,9 +49,9 @@ public static class SpreadsheetAnalyzer
             int? headerRow = null;
             var headers = new List<string>();
 
+            var filledPerRow = new int[lastRow + 1];
             for (var r = 1; r <= lastRow; r++)
             {
-                var rowHasText = false;
                 for (var c = 1; c <= lastCol; c++)
                 {
                     var cell = ws.Cell(r, c);
@@ -67,15 +67,12 @@ public static class SpreadsheetAnalyzer
                     else
                     {
                         filled++;
-                        rowHasText = true;
+                        filledPerRow[r]++;
                     }
                 }
-
-                if (headerRow is null && rowHasText)
-                {
-                    headerRow = r;
-                }
             }
+
+            headerRow = DetectHeaderRow(filledPerRow, lastRow, lastCol);
 
             if (headerRow is { } hr)
             {
@@ -91,7 +88,8 @@ public static class SpreadsheetAnalyzer
                 var row = new List<string>(lastCol);
                 for (var c = 1; c <= lastCol; c++)
                 {
-                    row.Add(ws.Cell(r, c).GetFormattedString());
+                    var cell = ws.Cell(r, c);
+                    row.Add(cell.HasFormula ? "=" + cell.FormulaA1 : cell.GetFormattedString());
                 }
 
                 preview.Add(row);
@@ -106,6 +104,27 @@ public static class SpreadsheetAnalyzer
         }
 
         return new SpreadsheetAnalysis(Path.GetFileName(path), "Excel (.xlsx)", hash, sheets, warnings);
+    }
+
+    /// <summary>
+    /// Cabeçalho = primeira linha que ocupa pelo menos metade das colunas (ignora títulos mesclados
+    /// em uma só célula acima da tabela). Sem essa linha, usa a primeira linha com conteúdo.
+    /// </summary>
+    internal static int? DetectHeaderRow(IReadOnlyList<int> filledPerRow, int lastRow, int lastCol)
+    {
+        var threshold = lastCol >= 2 ? Math.Max(2, (lastCol + 1) / 2) : 1;
+        int? firstNonEmpty = null;
+        for (var r = 1; r <= lastRow; r++)
+        {
+            if (filledPerRow[r] >= threshold)
+            {
+                return r;
+            }
+
+            firstNonEmpty ??= filledPerRow[r] > 0 ? r : null;
+        }
+
+        return firstNonEmpty;
     }
 
     private static SpreadsheetAnalysis AnalyzeCsv(string path, string hash)

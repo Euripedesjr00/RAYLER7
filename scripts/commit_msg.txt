@@ -1,12 +1,13 @@
-Fundacao do RAYLER7: nucleo de preservacao, selecao, duvidas, planilhas e login
+Interface WPF: login, capa, Etapa 1 e mapeamento persistente
 
-- Valor original imutavel, separado do valor interpretado (regra central)
-- Selecionar todos os dados em todas as paginas, com escopo explicito no filtro
-- Deteccao de duvidas sem IA (0/8, 1/7, virgula/ponto, motores divergentes)
-- Interpretador de instrucoes em portugues sem IA
-- Analise de planilha-modelo e preenchimento de copia (modelo nunca e alterado)
-- SQLite com migracoes, login Argon2id com bloqueio progressivo, DPAPI
-- 80 testes automatizados
+- Layout fiel ao app de referencia (slate/emerald, cabecalho com bandeiras vetoriais)
+- Primeira execucao cria administrador local; login com bloqueio progressivo
+- Capa com projetos recentes e "Continuar projeto" (mapeamento recarregado)
+- Etapa 1: analise do modelo, previa, instrucoes interpretadas sem IA, mapeamento travavel
+- Etapas 2 e 3 identificadas como pendentes (sem simulacao)
+- Correcoes apos teste real no Windows 11: janela cabe na tela, titulo mesclado
+  nao vira cabecalho, formulas visiveis na previa, rolagem sobre tabelas, rotulos em PT-BR
+- RAYLER7_DATA permite testar numa pasta separada dos dados reais
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01MYFPrFXy4xzXfnS4QkZVoH

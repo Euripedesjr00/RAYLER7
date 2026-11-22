@@ -1,0 +1,73 @@
+<Window x:Class="Rayler7.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="clr-namespace:Rayler7.App.Controls"
+        Title="RAYLER7" Width="1360" Height="860" MinWidth="980" MinHeight="620"
+        WindowStartupLocation="CenterScreen" Background="{StaticResource PageBg}"
+        FontFamily="{StaticResource BodyFont}" UseLayoutRounding="True" TextOptions.TextFormattingMode="Display">
+    <DockPanel>
+        <!-- Cabeçalho (64px): marca + bandeiras · navegação · ação principal -->
+        <Border DockPanel.Dock="Top" Background="White" BorderBrush="{StaticResource Border}" BorderThickness="0,0,0,1" Height="64">
+            <Grid Margin="24,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Command="{Binding GoCoverCommand}" Cursor="Hand" Background="Transparent" BorderThickness="0"
+                        IsEnabled="{Binding IsLoggedIn}" ToolTip="Página inicial" Padding="0">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button"><ContentPresenter /></ControlTemplate>
+                    </Button.Template>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <c:BrazilFlag Width="24" Height="17" />
+                        <c:IsraelFlag Width="24" Height="17" Margin="6,0,0,0" />
+                        <TextBlock Text="RAYLER7" Margin="12,0,0,0" FontSize="19" FontWeight="Bold" FontFamily="{StaticResource DisplayFont}"
+                                   Foreground="{StaticResource Text}" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Visibility="{Binding ShowHeaderNav, Converter={StaticResource BoolToVis}}">
+                    <Button Content="Início" Style="{StaticResource NavButton}" Command="{Binding GoCoverCommand}" x:Name="NavCover" />
+                    <Button Content="Etapa 1" Style="{StaticResource NavButton}" Command="{Binding GoStage1Command}" IsEnabled="{Binding HasProject}" x:Name="NavS1" />
+                    <Button Content="Etapa 2" Style="{StaticResource NavButton}" Command="{Binding GoStage2Command}" IsEnabled="{Binding CanStage2}" x:Name="NavS2" />
+                    <Button Content="Etapa 3" Style="{StaticResource NavButton}" Command="{Binding GoStage3Command}" IsEnabled="{Binding CanStage3}" x:Name="NavS3" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center"
+                            Visibility="{Binding IsLoggedIn, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="{Binding UserDisplay}" Style="{StaticResource Muted}" VerticalAlignment="Center" Margin="0,0,14,0" />
+                    <Button Content="Sair" Style="{StaticResource SmallOutlineButton}" Command="{Binding LogoutCommand}" Margin="0,0,8,0"
+                            ToolTip="Encerrar sessão" />
+                    <Button Style="{StaticResource DarkButton}" Command="{Binding NewProjectCommand}" Padding="16,8">
+                        <TextBlock Text="＋  NOVO PROJETO" />
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Barra do projeto: nome + progresso das etapas -->
+        <Border DockPanel.Dock="Top" Background="{StaticResource SubtleBg}" BorderBrush="{StaticResource Border}" BorderThickness="0,0,0,1"
+                Visibility="{Binding ShowProjectBar, Converter={StaticResource BoolToVis}}">
+            <StackPanel Orientation="Horizontal" Margin="24,8">
+                <TextBlock Text="{Binding ProjectName}" FontWeight="SemiBold" FontSize="12" Foreground="{StaticResource Slate800Brush}"
+                           VerticalAlignment="Center" MaxWidth="260" TextTrimming="CharacterEllipsis" />
+                <TextBlock Text="  ·  " Style="{StaticResource Muted}" VerticalAlignment="Center" />
+                <Button x:Name="Pill1" Content="1. Modelo e Instruções" Style="{StaticResource SmallOutlineButton}" Command="{Binding GoStage1Command}" Margin="4,0" />
+                <Button x:Name="Pill2" Content="2. Extração de Dados" Style="{StaticResource SmallOutlineButton}" Command="{Binding GoStage2Command}" IsEnabled="{Binding CanStage2}" Margin="4,0" />
+                <Button x:Name="Pill3" Content="3. Personalização e Exportação" Style="{StaticResource SmallOutlineButton}" Command="{Binding GoStage3Command}" IsEnabled="{Binding CanStage3}" Margin="4,0" />
+            </StackPanel>
+        </Border>
+
+        <!-- Barra de status -->
+        <Border DockPanel.Dock="Bottom" Background="White" BorderBrush="{StaticResource Border}" BorderThickness="0,1,0,0" Padding="24,6">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Right" Style="{StaticResource Muted}" Text="Processamento local · sem envio de dados para a internet" />
+                <TextBlock Text="{Binding StatusText}" Style="{StaticResource Muted}" />
+            </DockPanel>
+        </Border>
+
+        <ContentControl Content="{Binding CurrentPage}" Focusable="False" />
+    </DockPanel>
+</Window>

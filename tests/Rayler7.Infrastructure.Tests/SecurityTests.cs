@@ -43,7 +43,7 @@ public class SecurityTests
         using var dir = new TempDir();
         var (_, _, db) = Setup(dir);
         db.Migrate();
-        Assert.Equal(1, db.CurrentVersion());
+        Assert.Equal(Migrations.All.Count, db.CurrentVersion());
     }
 
     [Fact]
@@ -128,5 +128,52 @@ public class SecurityTests
         var e = Assert.Single(log.Entries(project));
         Assert.Equal("1,08", e.OldValue);
         Assert.Equal("1,80", e.NewValue);
+    }
+}
+
+public class ProjectServiceTests
+{
+    [Fact]
+    public void Cria_projeto_importa_copia_e_verifica_integridade()
+    {
+        using var dir = new TempDir();
+        var db = new Database(dir.File("r7.db"));
+        db.Migrate();
+        var svc = new Rayler7.Infrastructure.Projects.ProjectService(db, dir.File("projetos"));
+        var p = svc.Create("Ensaio milho", "jhon");
+        var src = dir.File("modelo.csv");
+        System.IO.File.WriteAllText(src, "A;B\n001;12,50\n");
+
+        var f = svc.ImportFile(p, src, Rayler7.Infrastructure.Projects.ProjectService.RoleTemplate);
+
+        Assert.True(System.IO.File.Exists(f.StoredPath));
+        Assert.NotEqual(src, f.StoredPath);
+        Assert.Empty(svc.VerifyIntegrity(p.Id));
+        Assert.Single(svc.Recent());
+        svc.SaveInstructions(p.Id, "Coluna 1: código");
+        Assert.Equal("Coluna 1: código", svc.Get(p.Id)!.Instructions);
+    }
+}
+
+public class MappingStoreTests
+{
+    [Fact]
+    public void Mapeamento_salvo_e_recarregado()
+    {
+        using var dir = new TempDir();
+        var db = new Database(dir.File("r7.db"));
+        db.Migrate();
+        var svc = new Rayler7.Infrastructure.Projects.ProjectService(db, dir.File("projetos"));
+        var p = svc.Create("X", "jhon");
+        var store = new Rayler7.Infrastructure.Projects.MappingStore(db);
+        var dict = new Dictionary<string, string> { ["1"] = "carro", ["2"] = "moto" };
+
+        store.Save(p.Id, [new Rayler7.Core.Mapping.ColumnMapping(1, "Tipo", "Veículo", false, dict, Rayler7.Core.Mapping.MappingSource.Instruction)], confirmed: true);
+        var (maps, confirmed) = store.Load(p.Id);
+
+        Assert.True(confirmed);
+        var m = Assert.Single(maps);
+        Assert.Equal("Veículo", m.Meaning);
+        Assert.Equal("moto", m.ValueDictionary["2"]);
     }
 }

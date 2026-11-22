@@ -1,0 +1,1 @@
+A coluna A corresponde ao tratamento; a coluna B corresponde à repetição; a coluna C corresponde à altura das plantas; a coluna D corresponde ao diâmetro. Cada fotografia apresenta os resultados de uma repetição. Não arredondar valores.

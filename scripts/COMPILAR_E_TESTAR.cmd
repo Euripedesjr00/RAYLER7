@@ -4,6 +4,8 @@ cd /d "%~dp0.."
 if not exist logs mkdir logs
 set DOTNET_CLI_TELEMETRY_OPTOUT=1
 set DOTNET_NOLOGO=1
+rem fecha uma copia aberta do programa para liberar o executavel
+taskkill /im RAYLER7.exe /f >nul 2>&1
 set DN="C:\Program Files\dotnet\dotnet.exe"
 echo === %date% %time% === > logs\build.txt
 %DN% --version >> logs\build.txt 2>&1

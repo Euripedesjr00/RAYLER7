@@ -1,0 +1,19 @@
+<Application x:Class="Rayler7.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:Rayler7.App.ViewModels"
+             xmlns:v="clr-namespace:Rayler7.App.Views"
+             ShutdownMode="OnMainWindowClose">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/Theme.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BoolToVis" />
+            <DataTemplate DataType="{x:Type vm:LoginViewModel}"><v:LoginView /></DataTemplate>
+            <DataTemplate DataType="{x:Type vm:CoverViewModel}"><v:CoverView /></DataTemplate>
+            <DataTemplate DataType="{x:Type vm:Stage1ViewModel}"><v:Stage1View /></DataTemplate>
+            <DataTemplate DataType="{x:Type vm:PendingStageViewModel}"><v:PendingStageView /></DataTemplate>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

@@ -40,6 +40,9 @@ public class SpreadsheetTests
         Assert.Contains("C3*2", s.Formulas[0], StringComparison.Ordinal);
         Assert.Single(s.MergedRanges);
         Assert.True(s.HasAutoFilter);
+        Assert.Equal(2, s.HeaderRow); // o título mesclado da linha 1 não é cabeçalho
+        Assert.Equal("Tratamento", s.Headers[0]);
+        Assert.Equal("=C3*2", s.Preview[2][3]);
         Assert.Equal(64, a.Sha256.Length);
     }
 

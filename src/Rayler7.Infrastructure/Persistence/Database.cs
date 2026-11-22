@@ -137,5 +137,18 @@ public static class Migrations
             CREATE INDEX ix_audit_project ON audit_log(project_id);
             CREATE TABLE settings(key TEXT PRIMARY KEY, value TEXT NOT NULL);
             """),
+        new(2, "mapeamentos", """
+            CREATE TABLE column_mappings(
+                project_id TEXT NOT NULL REFERENCES projects(id),
+                column_index INTEGER NOT NULL,
+                header TEXT NULL,
+                meaning TEXT NOT NULL,
+                expect_numeric INTEGER NOT NULL DEFAULT 0,
+                dictionary_json TEXT NOT NULL DEFAULT '{}',
+                source TEXT NOT NULL,
+                PRIMARY KEY(project_id, column_index)
+            );
+            ALTER TABLE projects ADD COLUMN mapping_confirmed INTEGER NOT NULL DEFAULT 0;
+            """),
     ];
 }

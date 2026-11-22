@@ -17,9 +17,14 @@ internal sealed class TempDir : IDisposable
         Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();
         try
         {
+            foreach (var f in Directory.EnumerateFiles(Path, "*", SearchOption.AllDirectories))
+            {
+                System.IO.File.SetAttributes(f, FileAttributes.Normal);
+            }
+
             Directory.Delete(Path, recursive: true);
         }
-        catch (IOException)
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             // arquivos temporários; o sistema limpa depois
         }

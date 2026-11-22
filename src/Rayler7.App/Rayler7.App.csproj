@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>Rayler7.App</RootNamespace>
+    <AssemblyName>RAYLER7</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <NoWarn>$(NoWarn);MVVMTK0045;CA1515</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Using Include="System.IO" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.*" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Rayler7.Core\Rayler7.Core.csproj" />
+    <ProjectReference Include="..\Rayler7.Infrastructure\Rayler7.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

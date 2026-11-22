@@ -38,6 +38,9 @@ public sealed class MappingSet
             null, string.Join("; ", _items.Values.Select(m => $"{m.ColumnLetter}={m.Meaning}")), "usuário", null));
     }
 
+    /// <summary>Restaura o estado "confirmado" ao reabrir um projeto (a confirmação original já está no histórico).</summary>
+    public void RestoreConfirmedState() => IsConfirmed = true;
+
     public void Unlock(string user, Guid projectId, IAuditLog audit, string reason)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(user);

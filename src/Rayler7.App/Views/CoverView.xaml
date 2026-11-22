@@ -1,0 +1,115 @@
+<UserControl x:Class="Rayler7.App.Views.CoverView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="clr-namespace:Rayler7.App.Controls">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel MaxWidth="1200" Margin="24,36">
+            <!-- Capa com destaque para a bandeira do Brasil -->
+            <Border Style="{StaticResource Card}" Padding="40">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="7*" />
+                        <ColumnDefinition Width="32" />
+                        <ColumnDefinition Width="5*" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal">
+                            <c:BrazilFlag Width="32" Height="22" />
+                            <c:IsraelFlag Width="32" Height="22" Margin="8,0,0,0" />
+                            <TextBlock Text="  ·  Organização científica e empresarial de dados" Style="{StaticResource Muted}" FontWeight="Medium" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <TextBlock Text="RAYLER7" Style="{StaticResource H1}" FontSize="48" Margin="0,18,0,0" />
+                        <TextBlock Style="{StaticResource Body}" FontSize="17" LineHeight="27" Margin="0,14,0,0" MaxWidth="640" HorizontalAlignment="Left"
+                                   Text="Envie sua planilha-modelo, defina regras personalizadas de interpretação e extraia dados de fotografias, PDFs, documentos Word e tabelas — preservando cada número, zero à esquerda e casa decimal sem alterações automáticas." />
+                        <WrapPanel Margin="0,22,0,0">
+                            <Button Style="{StaticResource PrimaryButton}" Command="{Binding StartNewCommand}" Margin="0,0,12,8" Padding="20,12">
+                                <TextBlock Text="▶  Iniciar novo projeto" />
+                            </Button>
+                            <Button Style="{StaticResource DarkButton}" Command="{Binding ContinueLatestCommand}" Margin="0,0,12,8" Padding="20,12">
+                                <TextBlock Text="↺  Continuar projeto" />
+                            </Button>
+                            <Button Style="{StaticResource OutlineButton}" Command="{Binding OpenSpreadsheetCommand}" Margin="0,0,12,8" Padding="20,12">
+                                <TextBlock Text="📂  Abrir planilha" />
+                            </Button>
+                        </WrapPanel>
+                        <WrapPanel Margin="0,10,0,0">
+                            <TextBlock Style="{StaticResource Muted}" Text="✔ Preservação integral de números e fórmulas" Foreground="{StaticResource PrimaryText}" />
+                            <TextBlock Style="{StaticResource Muted}" Text="   ·   Conferência manual de dúvidas de leitura" />
+                            <TextBlock Style="{StaticResource Muted}" Text="   ·   Funciona sem internet e sem IA paga" />
+                        </WrapPanel>
+                    </StackPanel>
+                    <Border Grid.Column="2" Style="{StaticResource SubtleCard}" Padding="32">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Border Background="White" BorderBrush="{StaticResource Border}" BorderThickness="1" CornerRadius="12" Padding="16" HorizontalAlignment="Center">
+                                <c:BrazilFlag Width="150" Height="105" />
+                            </Border>
+                            <TextBlock Text="Tecnologia em Português do Brasil" FontWeight="SemiBold" FontSize="14" Foreground="{StaticResource Text}"
+                                       HorizontalAlignment="Center" Margin="0,16,0,4" />
+                            <TextBlock Style="{StaticResource Muted}" TextAlignment="Center" MaxWidth="300"
+                                       Text="Desenvolvido para pesquisadores, laboratórios, estatísticos e equipes que exigem precisão absoluta na organização de tabelas." />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- As três etapas -->
+            <UniformGrid Columns="3" Margin="0,24,0,0">
+                <Border Style="{StaticResource Card}" Margin="0,0,12,0">
+                    <StackPanel>
+                        <TextBlock Text="01. Etapa 1" Style="{StaticResource Eyebrow}" />
+                        <TextBlock Text="Modelo e Instruções" Style="{StaticResource H2}" FontSize="15" Margin="0,6" />
+                        <TextBlock Style="{StaticResource Body}" FontSize="13" Text="Envie sua planilha-modelo e descreva como cada coluna e variável deve ser interpretada." />
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource Card}" Margin="6,0">
+                    <StackPanel>
+                        <TextBlock Text="02. Etapa 2" Style="{StaticResource Eyebrow}" />
+                        <TextBlock Text="Extração e Conferência" Style="{StaticResource H2}" FontSize="15" Margin="0,6" />
+                        <TextBlock Style="{StaticResource Body}" FontSize="13" Text="Processe lotes de fotos, PDFs, Word e planilhas. Valores duvidosos são sinalizados para sua decisão — nada é alterado sozinho." />
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource Card}" Margin="12,0,0,0">
+                    <StackPanel>
+                        <TextBlock Text="03. Etapa 3" Style="{StaticResource Eyebrow}" />
+                        <TextBlock Text="Personalização e Exportação" Style="{StaticResource H2}" FontSize="15" Margin="0,6" />
+                        <TextBlock Style="{StaticResource Body}" FontSize="13" Text="Aplique estilos visuais sem mexer nos dados e exporte para os formatos efetivamente implementados." />
+                    </StackPanel>
+                </Border>
+            </UniformGrid>
+
+            <!-- Projetos recentes -->
+            <Border Style="{StaticResource Card}" Margin="0,24,0,0" Padding="32">
+                <StackPanel>
+                    <TextBlock Text="Projetos recentes" Style="{StaticResource H2}" />
+                    <TextBlock Style="{StaticResource Muted}" Margin="0,4,0,14">
+                        <Run Text="Armazenamento local neste computador, em " /><Run Text="{Binding DataFolder, Mode=OneWay}" FontFamily="{StaticResource MonoFont}" />
+                    </TextBlock>
+                    <Border BorderBrush="{StaticResource Border}" BorderThickness="0,1,0,0" />
+                    <StackPanel Visibility="{Binding HasNoRecent, Converter={StaticResource BoolToVis}}" Margin="0,28">
+                        <TextBlock Text="Nenhum projeto salvo ainda" HorizontalAlignment="Center" FontWeight="Medium" Foreground="{StaticResource Slate700Brush}" />
+                        <TextBlock Text="Clique em “Iniciar novo projeto” ou “Abrir planilha” para começar." Style="{StaticResource Muted}" HorizontalAlignment="Center" Margin="0,4,0,0" />
+                    </StackPanel>
+                    <ItemsControl ItemsSource="{Binding Recent}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="{StaticResource Border}" BorderThickness="0,0,0,1" Padding="0,14">
+                                    <DockPanel>
+                                        <Button DockPanel.Dock="Right" Style="{StaticResource DarkButton}" Padding="14,8" FontSize="12"
+                                                Command="{Binding DataContext.OpenCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}">
+                                            <TextBlock Text="CONTINUAR ESTE PROJETO  →" />
+                                        </Button>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Project.Name}" FontWeight="SemiBold" Foreground="{StaticResource Text}" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Text="{Binding Details}" Style="{StaticResource Muted}" Margin="0,3,0,0" />
+                                        </StackPanel>
+                                    </DockPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

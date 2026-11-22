@@ -1,0 +1,16 @@
+<UserControl x:Class="Rayler7.App.Controls.IsraelFlag"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             AutomationProperties.Name="Bandeira de Israel" SnapsToDevicePixels="True">
+    <Border BorderBrush="#1A000000" BorderThickness="0.5" CornerRadius="2" ClipToBounds="True">
+        <Viewbox Stretch="Uniform">
+            <Canvas Width="22" Height="16">
+                <Rectangle Width="22" Height="16" Fill="White" />
+                <Rectangle Canvas.Top="1.5" Width="22" Height="2.5" Fill="#0038B8" />
+                <Rectangle Canvas.Top="12" Width="22" Height="2.5" Fill="#0038B8" />
+                <Polygon Points="11,5.1 13.5,9.45 8.5,9.45" Stroke="#0038B8" StrokeThickness="0.6" StrokeLineJoin="Miter" />
+                <Polygon Points="11,10.9 13.5,6.55 8.5,6.55" Stroke="#0038B8" StrokeThickness="0.6" StrokeLineJoin="Miter" />
+            </Canvas>
+        </Viewbox>
+    </Border>
+</UserControl>
