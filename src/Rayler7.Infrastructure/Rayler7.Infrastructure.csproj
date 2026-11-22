@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RootNamespace>Rayler7.Infrastructure</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="ClosedXML" Version="0.105.*" />
+    <PackageReference Include="Konscious.Security.Cryptography.Argon2" Version="1.3.*" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.*" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.*" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Rayler7.Core\Rayler7.Core.csproj" />
+    <InternalsVisibleTo Include="Rayler7.Infrastructure.Tests" />
+  </ItemGroup>
+</Project>

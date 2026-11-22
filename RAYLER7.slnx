@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Rayler7.Core/Rayler7.Core.csproj" />
+    <Project Path="src/Rayler7.Infrastructure/Rayler7.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Rayler7.Core.Tests/Rayler7.Core.Tests.csproj" />
+    <Project Path="tests/Rayler7.Infrastructure.Tests/Rayler7.Infrastructure.Tests.csproj" />
+  </Folder>
+</Solution>

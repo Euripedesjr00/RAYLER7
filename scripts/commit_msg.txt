@@ -1,0 +1,12 @@
+Fundacao do RAYLER7: nucleo de preservacao, selecao, duvidas, planilhas e login
+
+- Valor original imutavel, separado do valor interpretado (regra central)
+- Selecionar todos os dados em todas as paginas, com escopo explicito no filtro
+- Deteccao de duvidas sem IA (0/8, 1/7, virgula/ponto, motores divergentes)
+- Interpretador de instrucoes em portugues sem IA
+- Analise de planilha-modelo e preenchimento de copia (modelo nunca e alterado)
+- SQLite com migracoes, login Argon2id com bloqueio progressivo, DPAPI
+- 80 testes automatizados
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01MYFPrFXy4xzXfnS4QkZVoH
