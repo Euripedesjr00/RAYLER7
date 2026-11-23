@@ -1,4 +1,4 @@
-Adiciona README com a situacao real de cada modulo
+Adiciona script de envio para o GitHub
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01MYFPrFXy4xzXfnS4QkZVoH
