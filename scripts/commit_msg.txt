@@ -1,13 +1,4 @@
-Etapa 2: extracao de arquivos digitais, revisao, duvidas e conferencia final
-
-- Leitura sem OCR e sem IA: Excel, CSV/TSV/TXT, Word (tabelas) e PDF com texto digital
-- Matriz de suporte real: imagens e .xls/.ods ficam como "Pendente", sem simular resultado
-- Registros com origem completa (arquivo, pagina, linha, coluna) persistidos no SQLite
-- Selecionar todos os dados em todas as paginas; escopo explicito com filtro ativo
-- Painel de duvidas: confirmar, usar alternativa, corrigir, deixar vazio ou rejeitar
-- Conferencia final bloqueia duvidas abertas sem autorizacao explicita
-- Gera planilha preenchida como copia (XLSX ou CSV); hash do modelo verificado
-- 99 testes automatizados
+Adiciona README com a situacao real de cada modulo
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01MYFPrFXy4xzXfnS4QkZVoH
