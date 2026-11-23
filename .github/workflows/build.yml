@@ -1,0 +1,31 @@
+name: Compilar e testar (Windows)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        # windows-2022 = mesma base do Windows 10; windows-2025 = base do Windows 11
+        os: [windows-2022, windows-2025]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: Restaurar
+        run: dotnet restore RAYLER7.slnx
+      - name: Compilar
+        run: dotnet build RAYLER7.slnx -c Release --no-restore
+      # Os testes de OCR dependem do OCR do Windows e dos dados do Tesseract instalados no PC;
+      # eles rodam localmente pelo scripts\COMPILAR_E_TESTAR.cmd.
+      - name: Testar
+        run: dotnet test RAYLER7.slnx -c Release --no-build --filter "Category!=OcrLocal" --logger "console;verbosity=normal"
