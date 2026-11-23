@@ -9,6 +9,8 @@ public interface IDialogs
 
     string[] OpenFiles(string title, string filter);
 
+    string? SaveFile(string title, string filter, string defaultName);
+
     bool Confirm(string message, string title);
 
     void Info(string message, string title);
@@ -26,6 +28,12 @@ public sealed class Dialogs : IDialogs
     {
         var d = new OpenFileDialog { Title = title, Filter = filter, Multiselect = true };
         return d.ShowDialog() == true ? d.FileNames : [];
+    }
+
+    public string? SaveFile(string title, string filter, string defaultName)
+    {
+        var d = new SaveFileDialog { Title = title, Filter = filter, FileName = defaultName, OverwritePrompt = true, AddExtension = true };
+        return d.ShowDialog() == true ? d.FileName : null;
     }
 
     public bool Confirm(string message, string title) =>

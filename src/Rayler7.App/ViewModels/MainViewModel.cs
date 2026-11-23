@@ -116,10 +116,7 @@ public sealed partial class MainViewModel : ObservableObject
         }
 
         Stage = AppStage.Stage3;
-        CurrentPage = new PendingStageViewModel(
-            "Etapa 3 de 3",
-            "ETAPA 3 – PERSONALIZAÇÃO E EXPORTAÇÃO",
-            "A planilha preenchida já é gerada ao confirmar a Etapa 2 (pasta \"trabalho\" do projeto). A personalização visual e a exportação em outros formatos estão em desenvolvimento.");
+        CurrentPage = new Stage3ViewModel(_services, _dialogs, this, Workspace!);
         OnPropertyChanged(nameof(ShowProjectBar));
     }
 

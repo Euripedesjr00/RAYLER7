@@ -125,7 +125,7 @@ public static partial class InstructionParser
         SentenceSplit().Split(text.Replace("\r", string.Empty, StringComparison.Ordinal));
 
     /// <summary>Remove acentos preservando o comprimento, e põe em minúsculas.</summary>
-    internal static string Fold(string s)
+    public static string Fold(string s)
     {
         var sb = new StringBuilder(s.Length);
         foreach (var ch in s)

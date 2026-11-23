@@ -603,6 +603,8 @@ public sealed partial class Stage2ViewModel : ObservableObject
             {
                 _dialogs.Info($"{report.Conflicts.Count} célula(s) já preenchida(s) no modelo foram preservadas e não receberam dados novos.", "Conflitos preservados");
             }
+
+            _main.GoStage3Command.Execute(null);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidOperationException)
         {

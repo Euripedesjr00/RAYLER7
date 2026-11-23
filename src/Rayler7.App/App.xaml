@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="clr-namespace:Rayler7.App.ViewModels"
              xmlns:v="clr-namespace:Rayler7.App.Views"
+             xmlns:c="clr-namespace:Rayler7.App.Controls"
              ShutdownMode="OnMainWindowClose">
     <Application.Resources>
         <ResourceDictionary>
@@ -10,10 +11,12 @@
                 <ResourceDictionary Source="Themes/Theme.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <BooleanToVisibilityConverter x:Key="BoolToVis" />
+            <c:InverseBoolConverter x:Key="InverseBool" />
             <DataTemplate DataType="{x:Type vm:LoginViewModel}"><v:LoginView /></DataTemplate>
             <DataTemplate DataType="{x:Type vm:CoverViewModel}"><v:CoverView /></DataTemplate>
             <DataTemplate DataType="{x:Type vm:Stage1ViewModel}"><v:Stage1View /></DataTemplate>
             <DataTemplate DataType="{x:Type vm:Stage2ViewModel}"><v:Stage2View /></DataTemplate>
+            <DataTemplate DataType="{x:Type vm:Stage3ViewModel}"><v:Stage3View /></DataTemplate>
             <DataTemplate DataType="{x:Type vm:PendingStageViewModel}"><v:PendingStageView /></DataTemplate>
         </ResourceDictionary>
     </Application.Resources>

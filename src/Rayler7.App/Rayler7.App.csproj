@@ -7,8 +7,13 @@
     <RootNamespace>Rayler7.App</RootNamespace>
     <AssemblyName>RAYLER7</AssemblyName>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <SatelliteResourceLanguages>pt-BR;pt</SatelliteResourceLanguages>
+    <ApplicationIcon>Assets\rayler7.ico</ApplicationIcon>
     <NoWarn>$(NoWarn);MVVMTK0045;CA1515</NoWarn>
   </PropertyGroup>
+  <ItemGroup>
+    <Resource Include="Assets\rayler7.ico" />
+  </ItemGroup>
   <ItemGroup>
     <Using Include="System.IO" />
   </ItemGroup>
