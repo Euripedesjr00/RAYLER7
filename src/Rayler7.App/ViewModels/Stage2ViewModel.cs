@@ -67,9 +67,14 @@ public sealed class RecordRow(ExtractedRecord record, Stage2ViewModel owner) : O
     public void Refresh() => OnPropertyChanged(string.Empty);
 }
 
-public sealed partial class DoubtRow(ExtractedRecord record) : ObservableObject
+public sealed partial class DoubtRow(ExtractedRecord record, System.Windows.Media.ImageSource? crop) : ObservableObject
 {
     public ExtractedRecord Record { get; } = record;
+
+    /// <summary>Trecho da imagem original onde o valor foi lido.</summary>
+    public System.Windows.Media.ImageSource? Crop { get; } = crop;
+
+    public bool HasCrop => Crop is not null;
 
     public string Header => $"{Record.SourceFile} · {(Record.Page is { } p ? $"página {p}, " : string.Empty)}linha {Record.Row}, coluna {Record.Column} → destino {Record.TargetColumn ?? "nenhum"}";
 
@@ -88,13 +93,14 @@ public sealed partial class DoubtRow(ExtractedRecord record) : ObservableObject
 public sealed partial class Stage2ViewModel : ObservableObject
 {
     public const int PageSize = 100;
-    private const string SourceFilter = "Arquivos de dados|*.xlsx;*.xlsm;*.csv;*.tsv;*.txt;*.docx;*.pdf;*.jpg;*.jpeg;*.png;*.webp;*.tif;*.tiff|Todos os arquivos (*.*)|*.*";
+    private const string SourceFilter = "Arquivos de dados|*.xlsx;*.xlsm;*.csv;*.tsv;*.txt;*.docx;*.pdf;*.jpg;*.jpeg;*.png;*.bmp;*.webp;*.tif;*.tiff|Todos os arquivos (*.*)|*.*";
     private readonly AppServices _services;
     private readonly IDialogs _dialogs;
     private readonly MainViewModel _main;
     private readonly ProjectWorkspace _ws;
     private readonly RecordStore _store;
     private CancellationTokenSource? _cts;
+    private readonly Dictionary<Guid, string> _sourcePathByRecord = [];
 
     public Stage2ViewModel(AppServices services, IDialogs dialogs, MainViewModel main, ProjectWorkspace ws)
     {
@@ -107,10 +113,26 @@ public sealed partial class Stage2ViewModel : ObservableObject
 
         foreach (var f in services.Projects.Files(ws.Project.Id, ProjectService.RoleSource))
         {
-            Files.Add(new FileItem { File = f, Status = FileStatusLabel(f.Status), Detail = f.StatusMessage });
+            // Arquivos que ficaram "pendentes" numa versão anterior voltam para a fila quando o formato passa a ser suportado.
+            var nowSupported = f.Status == "pendente" && DocumentExtractor.Support(f.StoredPath) == SupportLevel.Supported;
+            Files.Add(new FileItem
+            {
+                File = f,
+                Status = nowSupported ? "Na fila" : FileStatusLabel(f.Status),
+                Detail = nowSupported ? "Formato agora suportado: pronto para processar." : f.StatusMessage,
+            });
         }
 
         var stored = _store.Load(ws.Project.Id);
+        var pathByFile = Files.ToDictionary(f => f.File.Id, f => f.File.StoredPath);
+        foreach (var s in stored)
+        {
+            if (s.FileId is { } fid && pathByFile.TryGetValue(fid, out var sp))
+            {
+                _sourcePathByRecord[s.Record.Id] = sp;
+            }
+        }
+
         Session.AddRecords(stored.Select(s => s.Record));
         foreach (var s in stored.Where(s => s.Selected && ReviewSession.IsEligible(s.Record)))
         {
@@ -455,6 +477,11 @@ public sealed partial class Stage2ViewModel : ObservableObject
                         return (all, warns, output.PagesAnalyzed);
                     }, token);
 
+                    foreach (var r in records)
+                    {
+                        _sourcePathByRecord[r.Id] = item.File.StoredPath;
+                    }
+
                     Session.AddRecords(records);
                     var doubts = records.Count(r => r.HasOpenDoubt);
                     var msg = $"{records.Count} dado(s) extraído(s){(doubts > 0 ? $" · {doubts} dúvida(s)" : string.Empty)}{(pages > 0 ? $" · {pages} pág." : string.Empty)}"
@@ -614,7 +641,7 @@ public sealed partial class Stage2ViewModel : ObservableObject
         DoubtRows.Clear();
         foreach (var r in Session.Records.Where(r => r.HasOpenDoubt).Take(200))
         {
-            DoubtRows.Add(new DoubtRow(r));
+            DoubtRows.Add(new DoubtRow(r, ImageCrops.Crop(_sourcePathByRecord.GetValueOrDefault(r.Id), r.Box)));
         }
 
         RefreshCounters();

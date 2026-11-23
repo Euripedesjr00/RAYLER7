@@ -9,6 +9,11 @@ taskkill /im RAYLER7.exe /f >nul 2>&1
 set DN="C:\Program Files\dotnet\dotnet.exe"
 echo === %date% %time% === > logs\build.txt
 %DN% --version >> logs\build.txt 2>&1
+rem Dados de idioma do Tesseract (portugues), baixados uma unica vez do repositorio oficial
+if not exist src\Rayler7.Infrastructure\tessdata\por.traineddata (
+  echo Baixando dados de idioma do Tesseract...
+  powershell -NoProfile -Command "New-Item -ItemType Directory -Force src\Rayler7.Infrastructure\tessdata | Out-Null; Invoke-WebRequest -UseBasicParsing -Uri https://github.com/tesseract-ocr/tessdata_fast/raw/main/por.traineddata -OutFile src\Rayler7.Infrastructure\tessdata\por.traineddata" >> logs\build.txt 2>&1
+)
 echo Restaurando pacotes...
 %DN% restore RAYLER7.slnx >> logs\build.txt 2>&1
 echo restore exit=%errorlevel% >> logs\build.txt

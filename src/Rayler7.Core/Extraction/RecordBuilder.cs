@@ -52,6 +52,12 @@ public static class RecordBuilder
                 var doubts = cell.Text.Length == 0 && cell.Confidence is null
                     ? new List<Doubt>()
                     : detector.Inspect(new OcrReading(cell.Text, cell.Characters, cell.Confidence, cell.AlternateText), expectation).ToList();
+                if (cell.SecondEngineMissed)
+                {
+                    doubts.Add(new Doubt(DoubtKind.EngineDisagreement,
+                        "O segundo motor de leitura não reconheceu este trecho. Confira com a imagem.", cell.Text, null));
+                }
+
                 if (target is null)
                 {
                     doubts.Add(new Doubt(DoubtKind.NoTargetColumn,
@@ -66,7 +72,7 @@ public static class RecordBuilder
 
                 var field = mapping?.Meaning ?? (target is { } tt && tt - 1 < templateHeaders.Count ? templateHeaders[tt - 1] : $"Coluna {c + 1} da origem");
                 records.Add(new ExtractedRecord(Guid.NewGuid(), table.SourceFile, table.Page, r + 1, ColumnLetters.FromIndex(c + 1), field,
-                    ValueClassifier.Classify(cell.Text), cell.Confidence, doubts, target is { } x ? ColumnLetters.FromIndex(x) : null));
+                    ValueClassifier.Classify(cell.Text), cell.Confidence, doubts, target is { } x ? ColumnLetters.FromIndex(x) : null, cell.Box));
             }
         }
 
@@ -93,7 +99,16 @@ public static class RecordBuilder
             }
 
             var idx = normalizedTemplate.IndexOf(n);
-            if (idx >= 0)
+            if (idx < 0)
+            {
+                // "Altura" na origem ↔ "Altura (cm)" no modelo: aceita quando só um cabeçalho do modelo começa assim.
+                var prefixed = normalizedTemplate.Select((t, i) => (t, i))
+                    .Where(x => x.t.StartsWith(n + " ", StringComparison.Ordinal) || n.StartsWith(x.t + " ", StringComparison.Ordinal))
+                    .ToList();
+                idx = prefixed.Count == 1 ? prefixed[0].i : -1;
+            }
+
+            if (idx >= 0 && !map.ContainsValue(idx + 1))
             {
                 map[c] = idx + 1;
             }

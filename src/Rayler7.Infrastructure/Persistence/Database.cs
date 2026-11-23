@@ -176,5 +176,8 @@ public static class Migrations
             ALTER TABLE projects ADD COLUMN conference_confirmed INTEGER NOT NULL DEFAULT 0;
             ALTER TABLE projects ADD COLUMN filled_path TEXT NULL;
             """),
+        new(4, "posicao_ocr", """
+            ALTER TABLE extracted_records ADD COLUMN bbox_json TEXT NULL;
+            """),
     ];
 }

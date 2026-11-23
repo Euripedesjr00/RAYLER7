@@ -27,6 +27,27 @@ public class RecordBuilderTests
     }
 
     [Fact]
+    public void Cabecalho_parcial_associa_altura_a_altura_cm()
+    {
+        var t = Table(["Tratamento", "Repetição", "Altura"], ["T1", "001", "12,50"]);
+
+        var r = RecordBuilder.Build(t, Headers, []);
+
+        Assert.Equal("C", r.Records.Single(x => x.Value.Original == "12,50").TargetColumn);
+    }
+
+    [Fact]
+    public void Trecho_nao_lido_pelo_segundo_motor_vira_duvida_sem_sugestao()
+    {
+        var t = new SourceTable("foto.png", 1, null, [[new SourceCell("T2", 0.95, null, null, null, SecondEngineMissed: true)]], []);
+
+        var rec = Assert.Single(RecordBuilder.Build(t, Headers, []).Records);
+
+        Assert.True(rec.HasOpenDoubt);
+        Assert.All(rec.Doubts, d => Assert.Null(d.SuggestedValue));
+    }
+
+    [Fact]
     public void Sem_cabecalho_associa_pela_ordem_e_preserva_valores()
     {
         var t = Table(["T1", "001", "12,50", "0.005"]);

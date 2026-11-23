@@ -91,7 +91,8 @@ public class ExtractionTests
     }
 
     [Theory]
-    [InlineData("foto.jpg", SupportLevel.Pending)]
+    [InlineData("foto.jpg", SupportLevel.Supported)]
+    [InlineData("foto.heic", SupportLevel.Pending)]
     [InlineData("velho.xls", SupportLevel.Pending)]
     [InlineData("dados.csv", SupportLevel.Supported)]
     [InlineData("doc.pdf", SupportLevel.Supported)]

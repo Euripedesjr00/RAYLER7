@@ -1,4 +1,12 @@
-Adiciona script de envio para o GitHub
+OCR gratuito e local para fotos (Tesseract + OCR do Windows)
+
+- Dois motores conferem um ao outro; divergencias e baixa confianca viram duvida
+- Linhas e colunas reconstruidas pela posicao das palavras
+- Conferencia de duvidas mostra o recorte da imagem original
+- Cabecalho parcial ("Altura" x "Altura (cm)") associado sem reutilizar colunas
+- Arquivos pendentes de versoes anteriores voltam para a fila
+- Teste que garante: nenhuma leitura errada passa sem virar duvida
+- Atalhos ABRIR apontam para a nova pasta de saida (Windows 10.0.19041)
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01MYFPrFXy4xzXfnS4QkZVoH

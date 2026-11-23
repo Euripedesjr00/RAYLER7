@@ -33,7 +33,7 @@
                         <StackPanel>
                             <TextBlock Text="Arquivos de origem dos dados" Style="{StaticResource H2}" />
                             <TextBlock Style="{StaticResource Muted}" Margin="0,4,0,0" MaxWidth="640" HorizontalAlignment="Left"
-                                       Text="Implementado: Excel (.xlsx, .xlsm), CSV, TSV, TXT, Word (.docx) e PDF com texto digital. Fotos e PDFs digitalizados são aceitos e guardados, mas o OCR entra na próxima versão." />
+                                       Text="Implementado: Excel (.xlsx, .xlsm), CSV, TSV, TXT, Word (.docx), PDF com texto digital e fotos/imagens (JPG, PNG, BMP, TIFF, WEBP) via OCR gratuito local. Manuscritos são lidos com baixa precisão: confira sempre." />
                         </StackPanel>
                     </DockPanel>
 
@@ -85,7 +85,7 @@
                                 <StackPanel><TextBlock Text="Enviados" Style="{StaticResource StatLabel}" /><TextBlock Text="{Binding Files.Count}" Style="{StaticResource StatValue}" /></StackPanel>
                                 <StackPanel><TextBlock Text="Na fila" Style="{StaticResource StatLabel}" /><TextBlock Text="{Binding Queued}" Style="{StaticResource StatValue}" /></StackPanel>
                                 <StackPanel><TextBlock Text="Processados" Style="{StaticResource StatLabel}" /><TextBlock Text="{Binding Done}" Style="{StaticResource StatValue}" /></StackPanel>
-                                <StackPanel><TextBlock Text="Pendentes (OCR)" Style="{StaticResource StatLabel}" /><TextBlock Text="{Binding PendingFiles}" Style="{StaticResource StatValue}" /></StackPanel>
+                                <StackPanel><TextBlock Text="Pendentes" Style="{StaticResource StatLabel}" /><TextBlock Text="{Binding PendingFiles}" Style="{StaticResource StatValue}" /></StackPanel>
                                 <StackPanel><TextBlock Text="Com falha" Style="{StaticResource StatLabel}" /><TextBlock Text="{Binding Failed}" Style="{StaticResource StatValue}" /></StackPanel>
                                 <StackPanel><TextBlock Text="Dados extraídos" Style="{StaticResource StatLabel}" /><TextBlock Text="{Binding Summary.TotalExtracted}" Style="{StaticResource StatValue}" /></StackPanel>
                             </UniformGrid>
@@ -173,6 +173,12 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Border Style="{StaticResource WarnBox}" Margin="0,0,0,10" Padding="14">
+                                    <DockPanel>
+                                    <Border DockPanel.Dock="Left" Margin="0,0,14,0" BorderBrush="{StaticResource WarnBorder}" BorderThickness="1" CornerRadius="6"
+                                            Background="White" Padding="4" MaxWidth="280" VerticalAlignment="Top"
+                                            Visibility="{Binding HasCrop, Converter={StaticResource BoolToVis}}" ToolTip="Trecho original da imagem">
+                                        <Image Source="{Binding Crop}" Stretch="Uniform" MaxHeight="120" RenderOptions.BitmapScalingMode="HighQuality" />
+                                    </Border>
                                     <StackPanel>
                                         <TextBlock Text="{Binding Header}" FontWeight="SemiBold" Foreground="{StaticResource WarnText}" FontSize="12" />
                                         <WrapPanel Margin="0,6,0,0">
@@ -196,6 +202,7 @@
                                                     Command="{Binding DataContext.RejectDoubtCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
                                         </WrapPanel>
                                     </StackPanel>
+                                    </DockPanel>
                                 </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>

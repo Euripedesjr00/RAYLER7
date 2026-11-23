@@ -12,7 +12,7 @@ public sealed class ExtractedRecord
     private readonly List<Doubt> _doubts;
 
     public ExtractedRecord(Guid id, string sourceFile, int? page, int? row, string? column, string fieldName,
-        PreservedValue value, double? confidence, IEnumerable<Doubt>? doubts = null, string? targetColumn = null)
+        PreservedValue value, double? confidence, IEnumerable<Doubt>? doubts = null, string? targetColumn = null, CellBox? box = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(sourceFile);
         Id = id;
@@ -24,6 +24,7 @@ public sealed class ExtractedRecord
         Value = value ?? throw new ArgumentNullException(nameof(value));
         Confidence = confidence;
         TargetColumn = targetColumn;
+        Box = box;
         _doubts = doubts?.ToList() ?? [];
         Status = _doubts.Count > 0 || value.Kind is ValueKind.AmbiguousNumber or ValueKind.Illegible
             ? RecordStatus.Doubtful
@@ -38,6 +39,9 @@ public sealed class ExtractedRecord
     public string FieldName { get; }
     public PreservedValue Value { get; }
     public double? Confidence { get; }
+
+    /// <summary>Onde o valor está na imagem de origem (quando veio de OCR).</summary>
+    public CellBox? Box { get; }
     public string? TargetColumn { get; private set; }
     public RecordStatus Status { get; private set; }
     public string? CorrectedText { get; private set; }

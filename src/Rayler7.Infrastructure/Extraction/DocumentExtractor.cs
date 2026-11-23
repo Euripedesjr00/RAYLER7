@@ -26,8 +26,8 @@ public sealed record ExtractionOutput(IReadOnlyList<SourceTable> Tables, IReadOn
 /// </summary>
 public static class DocumentExtractor
 {
-    private static readonly HashSet<string> Supported = new(StringComparer.OrdinalIgnoreCase) { ".xlsx", ".xlsm", ".csv", ".tsv", ".txt", ".docx", ".pdf" };
-    private static readonly HashSet<string> PendingOcr = new(StringComparer.OrdinalIgnoreCase) { ".jpg", ".jpeg", ".png", ".webp", ".tif", ".tiff", ".bmp", ".heic" };
+    private static readonly HashSet<string> Supported = new(StringComparer.OrdinalIgnoreCase) { ".xlsx", ".xlsm", ".csv", ".tsv", ".txt", ".docx", ".pdf", ".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff", ".webp" };
+    private static readonly HashSet<string> PendingOcr = new(StringComparer.OrdinalIgnoreCase) { ".heic" };
     private static readonly HashSet<string> PendingOther = new(StringComparer.OrdinalIgnoreCase) { ".xls", ".ods", ".doc", ".rtf" };
 
     public static SupportLevel Support(string path)
@@ -40,7 +40,7 @@ public static class DocumentExtractor
 
     public static string PendingReason(string path) =>
         PendingOcr.Contains(Path.GetExtension(path))
-            ? "Imagem: o OCR gratuito (Tesseract + OCR do Windows) entra na próxima versão. O arquivo fica guardado no projeto."
+            ? "HEIC ainda não é lido. Converta a foto para JPG ou PNG (no celular ou no app Fotos) e envie de novo."
             : $"O formato {Path.GetExtension(path)} ainda não está implementado. Salve como .xlsx/.docx e envie novamente.";
 
     public static ExtractionOutput Extract(string path, string displayName, CancellationToken ct = default)
@@ -52,6 +52,7 @@ public static class DocumentExtractor
             ".CSV" or ".TSV" or ".TXT" => Delimited(path, displayName),
             ".DOCX" => Word(path, displayName),
             ".PDF" => Pdf(path, displayName, ct),
+            ".JPG" or ".JPEG" or ".PNG" or ".BMP" or ".TIF" or ".TIFF" or ".WEBP" => ImageExtractor.Extract(path, displayName, ct),
             _ => throw new NotSupportedException(PendingReason(path)),
         };
     }
@@ -224,7 +225,7 @@ public static class DocumentExtractor
 
         if (scanned > 0)
         {
-            warnings.Add($"{name}: {scanned} página(s) sem texto digital (digitalizadas). Elas precisarão de OCR, que entra na próxima versão.");
+            warnings.Add($"{name}: {scanned} página(s) sem texto digital (digitalizadas). Exporte essas páginas como imagem (PNG/JPG) e envie as imagens: elas serão lidas por OCR.");
         }
 
         return new ExtractionOutput(tables, warnings, pages, 0);
