@@ -1,0 +1,31 @@
+name: Publicar versao (instalador)
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  instalador:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: Testes
+        run: dotnet test RAYLER7.slnx -c Release --filter "Category!=OcrLocal"
+      - name: Instalar Inno Setup
+        run: choco install innosetup -y --no-progress
+      - name: Gerar instalador
+        shell: cmd
+        run: call scripts\GERAR_INSTALADOR.cmd & type logs\instalador.txt & if not exist artifacts\instalador\*.exe exit /b 1
+      - name: Publicar Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/instalador/*.exe
+          name: RAYLER7 ${{ github.ref_name }}
+          body_path: installer/NOTAS_DA_VERSAO.md
