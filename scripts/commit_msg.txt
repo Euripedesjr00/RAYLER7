@@ -1,11 +1,14 @@
-RAYLER7 1.0.0: PDF digitalizado, .xls, .ods, HEIC e exportacao ODS
+RAYLER7 1.1.0: preparo de fotos, colunas pelo significado, fichas e modelo em qualquer formato
 
-- Paginas de PDF sem texto sao renderizadas pelo Windows e lidas pelos dois motores de OCR
-- Leitura de .xls (formato de exibicao de cada celula) e .ods (texto exibido, sem reformatar)
-- Fotos HEIC convertidas pelo decodificador do Windows
-- Exportacao nativa para LibreOffice (.ods) com todas as abas
-- Recortes de conferencia tambem para paginas de PDF digitalizado
-- Instalador 1.0.0 e notas da versao; script do instalador funciona no GitHub Actions
+- Foto preparada antes do OCR (EXIF, foto de lado, endireitamento, luz/contraste, ampliacao, nitidez);
+  os dois motores e os recortes usam a mesma imagem
+- Associacao de colunas por nome, sinonimo, instrucoes e tipo do valor (1 para 1);
+  titulos acima do cabecalho e cabecalhos repetidos ignorados
+- Fichas "Campo: Valor" em foto, PDF, Word e TXT viram linhas
+- Linhas repetidas viram duvida
+- Modelo em .xls, .ods, PDF, Word ou foto convertido para .xlsx
+- Arquivo com falha nao interrompe o lote; erros registrados em logs/erros.log
+- Ideias adaptadas do projeto web (sem a IA paga do Gemini); 159 testes aprovados
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01MYFPrFXy4xzXfnS4QkZVoH

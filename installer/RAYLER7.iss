@@ -1,6 +1,6 @@
 ; Instalador do RAYLER7 (Inno Setup 6). Gerado por scripts\GERAR_INSTALADOR.cmd
 #define AppName "RAYLER7"
-#define AppVersion "1.0.0"
+#define AppVersion "1.1.0"
 
 [Setup]
 AppId={{A840A183-D32E-41E8-9426-2799332B4526}

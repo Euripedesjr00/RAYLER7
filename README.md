@@ -18,6 +18,10 @@ Funciona 100% local, sem internet e sem serviços pagos de IA.
 | Etapa 2 — botão **Selecionar todos os dados** (todas as páginas) e conferência de dúvidas | ✅ Implementado |
 | Etapa 2 — geração da planilha preenchida (cópia; o modelo não é alterado) | ✅ Implementado |
 | OCR de fotos (.jpg, .png, .bmp, .tif, .webp, .heic) com dois motores gratuitos (Tesseract + OCR do Windows) | ✅ Implementado |
+| Preparo da foto antes do OCR: rotação da câmera, foto de lado, endireitamento, luz/contraste, ampliação e nitidez | ✅ Implementado |
+| Associação de colunas pelo significado (nome, sinônimo, instruções, tipo do valor), títulos e cabeçalhos repetidos ignorados | ✅ Implementado |
+| Fichas "Campo: Valor" (foto, PDF, Word, TXT) viram linhas; linhas repetidas viram dúvida | ✅ Implementado |
+| Modelo em .xls, .ods, PDF, Word ou foto (convertido para .xlsx para conferência) | ✅ Implementado |
 | Etapa 3 — 7 modelos de aparência + manter original, prévia e **Confirmar formatação** | ✅ Implementado |
 | Etapa 3 — exportação: Excel, LibreOffice (.ods), CSV (; e ,), TSV, TXT, JSON, DBF e pacotes para R, SPSS, Stata e SAS | ✅ Implementado |
 | Mensagem final "Criado por Jhon" só depois de uma exportação concluída | ✅ Implementado |
@@ -40,7 +44,7 @@ cálculo) e **corrigido** (somente com autorização, registrada no histórico).
 
 ## Baixar e instalar
 
-**[⬇ Baixar a versão mais recente](https://github.com/Euripedesjr00/RAYLER7/releases/latest)** — arquivo `RAYLER7_Instalador_1.0.0.exe`.
+**[⬇ Baixar a versão mais recente](https://github.com/Euripedesjr00/RAYLER7/releases/latest)** — arquivo `RAYLER7_Instalador_1.1.0.exe`.
 
 Execute o instalador. A instalação é só para o seu usuário
 (`%LOCALAPPDATA%\Programs\RAYLER7`), cria atalho no Menu Iniciar (e, se quiser, na área de trabalho)

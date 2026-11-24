@@ -1,3 +1,4 @@
+using Rayler7.Core.Imaging;
 using Windows.Globalization;
 using Windows.Graphics.Imaging;
 using Windows.Media.Ocr;
@@ -38,6 +39,41 @@ public static class WindowsOcr
         using var bitmap = await decoder.GetSoftwareBitmapAsync(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied, transform,
             ExifOrientationMode.RespectExifOrientation, ColorManagementMode.DoNotColorManage);
         var result = await engine.RecognizeAsync(bitmap);
+        return ToWords(result, scale);
+    }
+
+    /// <summary>Qualidade de uma leitura rápida, usada para descobrir a orientação certa da foto.</summary>
+    public readonly record struct OcrScore(int GoodWords, int Chars);
+
+    public static async Task<OcrScore> ScoreAsync(GrayImage image)
+    {
+        var engine = CreateEngine() ?? throw new InvalidOperationException("O OCR do Windows não está disponível neste computador.");
+        var max = (int)OcrEngine.MaxImageDimension;
+        if (Math.Max(image.Width, image.Height) > max)
+        {
+            image = image.Scale((double)max / Math.Max(image.Width, image.Height));
+        }
+
+        using var bitmap = ImagePreprocessor.ToSoftwareBitmap(image);
+        var result = await engine.RecognizeAsync(bitmap);
+        var good = 0;
+        var chars = 0;
+        foreach (var w in result.Lines.SelectMany(l => l.Words))
+        {
+            var t = w.Text;
+            var alnum = t.Count(char.IsLetterOrDigit);
+            if (t.Length >= 2 && alnum >= t.Length * 0.7)
+            {
+                good++;
+                chars += alnum;
+            }
+        }
+
+        return new OcrScore(good, chars);
+    }
+
+    private static List<OcrWord> ToWords(OcrResult result, double scale)
+    {
         var words = new List<OcrWord>();
         foreach (var line in result.Lines)
         {

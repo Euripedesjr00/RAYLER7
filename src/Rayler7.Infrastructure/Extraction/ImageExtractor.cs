@@ -1,4 +1,5 @@
 using Rayler7.Core.Extraction;
+using Tesseract;
 
 namespace Rayler7.Infrastructure.Extraction;
 
@@ -11,6 +12,27 @@ public static class ImageExtractor
     public static ExtractionOutput Extract(string path, string name, CancellationToken ct)
     {
         var warnings = new List<string>();
+
+        // Os dois motores leem a MESMA imagem preparada (posição correta, contraste, endireitada),
+        // para que as posições das palavras coincidam e os recortes mostrem o que foi lido.
+        PreparedImage prepared;
+        try
+        {
+            prepared = ImagePreprocessor.Prepare(path);
+        }
+        catch (Exception ex) when (ex is System.Runtime.InteropServices.COMException or ArgumentException or InvalidDataException or NotSupportedException)
+        {
+            throw new InvalidDataException($"{name}: o Windows não conseguiu abrir esta imagem ({ex.Message}). Tente salvá-la como JPG ou PNG.", ex);
+        }
+
+        ct.ThrowIfCancellationRequested();
+        if (prepared.Applied.Count > 0)
+        {
+            warnings.Add($"{name}: imagem preparada para leitura — {string.Join(", ", prepared.Applied)}.");
+        }
+
+        warnings.AddRange(prepared.Warnings.Select(w => $"{name}: {w}"));
+        path = prepared.OcrPath;
         List<OcrWord>? tess = null;
         List<OcrWord>? win = null;
         if (TesseractOcr.IsAvailable)
@@ -19,7 +41,7 @@ public static class ImageExtractor
             {
                 tess = TesseractOcr.Recognize(path);
             }
-            catch (Exception ex) when (ex is IOException or InvalidOperationException or DllNotFoundException or BadImageFormatException)
+            catch (Exception ex) when (ex is IOException or InvalidOperationException or DllNotFoundException or BadImageFormatException or TesseractException or ArgumentException)
             {
                 warnings.Add($"{name}: Tesseract não conseguiu ler a imagem ({ex.Message}).");
             }
@@ -34,7 +56,7 @@ public static class ImageExtractor
         {
             win = WindowsOcr.RecognizeAsync(path).GetAwaiter().GetResult();
         }
-        catch (Exception ex) when (ex is IOException or InvalidOperationException or UnauthorizedAccessException or System.Runtime.InteropServices.COMException)
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or UnauthorizedAccessException or System.Runtime.InteropServices.COMException or ArgumentException)
         {
             warnings.Add($"{name}: OCR do Windows não conseguiu ler a imagem ({ex.Message}).");
         }

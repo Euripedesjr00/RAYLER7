@@ -139,7 +139,7 @@
           "Konscious.Security.Cryptography.Argon2": "[1.3.*, )",
           "Microsoft.Data.Sqlite": "[10.0.*, )",
           "PdfPig": "[0.1.*, )",
-          "Rayler7.Core": "[1.0.0, )",
+          "Rayler7.Core": "[1.1.0, )",
           "Tesseract": "[5.2.*, )"
         }
       }

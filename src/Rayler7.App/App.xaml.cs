@@ -10,7 +10,27 @@ namespace Rayler7.App;
 
 public partial class App
 {
-    private string? _logPath;
+    private static string? _logPath;
+
+    /// <summary>Registra um erro tratado (ex.: arquivo que falhou no lote) para diagnóstico, sem dados do usuário.</summary>
+    public static void LogError(Exception ex)
+    {
+        ArgumentNullException.ThrowIfNull(ex);
+        try
+        {
+            if (_logPath is not null)
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(_logPath)!);
+                File.AppendAllText(_logPath, $"{DateTimeOffset.Now:O} {ex.GetType().FullName}: {ex.Message}{Environment.NewLine}{ex.StackTrace}{Environment.NewLine}");
+            }
+        }
+        catch (IOException)
+        {
+        }
+        catch (UnauthorizedAccessException)
+        {
+        }
+    }
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -22,6 +42,11 @@ public partial class App
             new FrameworkPropertyMetadata(XmlLanguage.GetLanguage(pt.IetfLanguageTag)));
 
         DispatcherUnhandledException += OnUnhandled;
+        TaskScheduler.UnobservedTaskException += (_, args) =>
+        {
+            LogError(args.Exception);
+            args.SetObserved();
+        };
         Controls.WheelForwarding.Register();
         try
         {
@@ -41,17 +66,7 @@ public partial class App
     private void OnUnhandled(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
         // Registra o erro sem dados do usuário e mantém o programa aberto.
-        try
-        {
-            if (_logPath is not null)
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(_logPath)!);
-                File.AppendAllText(_logPath, $"{DateTimeOffset.Now:O} {e.Exception.GetType().FullName}: {e.Exception.Message}{Environment.NewLine}{e.Exception.StackTrace}{Environment.NewLine}");
-            }
-        }
-        catch (IOException)
-        {
-        }
+        LogError(e.Exception);
 
         MessageBox.Show($"Ocorreu um erro inesperado. Seu trabalho salvo não foi afetado.\n\n{e.Exception.Message}", "RAYLER7", MessageBoxButton.OK, MessageBoxImage.Warning);
         e.Handled = true;

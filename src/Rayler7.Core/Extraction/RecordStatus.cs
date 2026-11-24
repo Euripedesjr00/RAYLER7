@@ -25,6 +25,10 @@ public enum DoubtKind
     Illegible,
     NoTargetColumn,
     RowShape,
+    /// <summary>Coluna associada pela posição, sem nome reconhecido: conferir.</summary>
+    PositionalMatch,
+    /// <summary>Linha com os mesmos valores de outra já existente.</summary>
+    DuplicateRow,
 }
 
 /// <summary>Dúvida identificada na extração. O sistema nunca a resolve sozinho.</summary>

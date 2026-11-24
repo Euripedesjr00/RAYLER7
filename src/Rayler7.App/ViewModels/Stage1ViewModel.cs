@@ -70,6 +70,12 @@ public sealed partial class Stage1ViewModel : ObservableObject
     private string? _error;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsBusy))]
+    private string? _busyText;
+
+    public bool IsBusy => BusyText is not null;
+
+    [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanAdvance))]
     private bool _isMappingConfirmed;
 
@@ -126,18 +132,25 @@ public sealed partial class Stage1ViewModel : ObservableObject
     public int ActiveSheetIndex => _ws.ActiveSheetIndex;
 
     [RelayCommand]
-    private void SelectTemplate()
+    private async Task SelectTemplate()
     {
         var path = _dialogs.OpenFile("Selecionar planilha-modelo", CoverViewModel.TemplateFilter);
         if (path is not null)
         {
-            LoadTemplate(path);
+            await LoadTemplateAsync(path);
         }
     }
 
-    public void LoadTemplate(string path)
+    public async void LoadTemplate(string path) => await LoadTemplateAsync(path);
+
+    public async Task LoadTemplateAsync(string path)
     {
         Error = null;
+        if (IsBusy)
+        {
+            return;
+        }
+
         if (_ws.TemplateFile is not null &&
             !_dialogs.Confirm(
                 $"Este projeto já possui a planilha-modelo \"{_ws.TemplateFile.OriginalName}\". Substituí-la por \"{Path.GetFileName(path)}\" reiniciará o mapeamento. O arquivo anterior continua guardado. Autorizar a substituição?",
@@ -148,15 +161,45 @@ public sealed partial class Stage1ViewModel : ObservableObject
 
         try
         {
-            var analysis = SpreadsheetAnalyzer.Analyze(path);
-            var file = _services.Projects.ImportFile(_ws.Project, path, ProjectService.RoleTemplate);
-            if (_ws.TemplateFile is not null && _services.CurrentUser is { } u)
+            var analysisPath = path;
+            IReadOnlyList<string> extraNotes = [];
+            if (!SpreadsheetAnalyzer.SupportedExtensions.Contains(Path.GetExtension(path)))
             {
-                _services.Audit.Append(new Core.Audit.AuditEntry(_ws.Project.Id, u.Username, DateTimeOffset.Now,
-                    "Substituir planilha-modelo", "modelo", _ws.TemplateFile.OriginalName, file.OriginalName, "usuário", null));
-                if (_ws.Mapping.IsConfirmed)
+                if (!TemplateConverter.CanConvert(path))
                 {
-                    _ws.Mapping.Unlock(u.Username, _ws.Project.Id, _services.Audit, "Modelo substituído");
+                    Error = $"O formato {Path.GetExtension(path)} não pode ser usado como modelo. Use Excel (.xlsx, .xlsm, .xls), LibreOffice (.ods), CSV, Word (.docx), PDF ou foto da tabela.";
+                    return;
+                }
+
+                BusyText = $"Lendo o modelo \"{Path.GetFileName(path)}\"… em fotos e PDFs digitalizados isso pode levar alguns segundos.";
+                var converted = await Task.Run(() => TemplateConverter.Convert(path));
+                analysisPath = converted.XlsxPath;
+                extraNotes = converted.Notes;
+            }
+
+            var analysis = await Task.Run(() => SpreadsheetAnalyzer.Analyze(analysisPath));
+            if (extraNotes.Count > 0)
+            {
+                analysis = analysis with { Warnings = [.. extraNotes, .. analysis.Warnings] };
+            }
+
+            var file = _services.Projects.ImportFile(_ws.Project, analysisPath, ProjectService.RoleTemplate);
+            if (_services.CurrentUser is { } u)
+            {
+                if (_ws.TemplateFile is not null)
+                {
+                    _services.Audit.Append(new Core.Audit.AuditEntry(_ws.Project.Id, u.Username, DateTimeOffset.Now,
+                        "Substituir planilha-modelo", "modelo", _ws.TemplateFile.OriginalName, file.OriginalName, "usuário", null));
+                    if (_ws.Mapping.IsConfirmed)
+                    {
+                        _ws.Mapping.Unlock(u.Username, _ws.Project.Id, _services.Audit, "Modelo substituído");
+                    }
+                }
+
+                if (analysisPath != path)
+                {
+                    _services.Audit.Append(new Core.Audit.AuditEntry(_ws.Project.Id, u.Username, DateTimeOffset.Now,
+                        "Converter modelo para .xlsx", "modelo", Path.GetFileName(path), file.OriginalName, "conversão local", null));
                 }
             }
 
@@ -174,9 +217,13 @@ public sealed partial class Stage1ViewModel : ObservableObject
             _main.RefreshProjectState();
             _main.Status($"Modelo analisado: {file.OriginalName} (cópia guardada; o arquivo original não foi alterado)");
         }
-        catch (Exception ex) when (ex is NotSupportedException or IOException or InvalidDataException or UnauthorizedAccessException)
+        catch (Exception ex) when (ex is not OutOfMemoryException)
         {
-            Error = ex.Message;
+            Error = $"Não foi possível usar \"{Path.GetFileName(path)}\" como modelo: {ex.Message}";
+        }
+        finally
+        {
+            BusyText = null;
         }
     }
 

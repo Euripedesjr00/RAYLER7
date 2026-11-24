@@ -53,6 +53,17 @@ public sealed class ExtractedRecord
 
     public bool HasOpenDoubt => Status == RecordStatus.Doubtful;
 
+    /// <summary>Acrescenta uma dúvida encontrada depois da leitura (ex.: linha repetida). Registros já decididos não mudam.</summary>
+    public void AddDoubt(Doubt doubt)
+    {
+        ArgumentNullException.ThrowIfNull(doubt);
+        _doubts.Add(doubt);
+        if (Status == RecordStatus.Pending)
+        {
+            Status = RecordStatus.Doubtful;
+        }
+    }
+
     /// <summary>Usado somente ao recarregar do banco um estado já auditado.</summary>
     public void RestoreState(RecordStatus status, string? correctedText, bool leaveEmpty)
     {

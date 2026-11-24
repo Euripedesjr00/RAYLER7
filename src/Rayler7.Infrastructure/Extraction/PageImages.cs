@@ -11,16 +11,22 @@ namespace Rayler7.Infrastructure.Extraction;
 /// </summary>
 public static class PageImages
 {
-    /// <summary>Imagem usada para recortes de conferência: a própria foto, ou a página renderizada.</summary>
+    /// <summary>
+    /// Imagem usada para recortes de conferência: a imagem preparada para o OCR (é nela que estão as
+    /// posições lidas). Para PDF, a da página; para HEIC, a da conversão.
+    /// </summary>
     public static string? PreviewPath(string storedPath, int? page)
     {
         var ext = Path.GetExtension(storedPath);
-        if (ext.Equals(".pdf", StringComparison.OrdinalIgnoreCase))
+        string? image = ext.Equals(".pdf", StringComparison.OrdinalIgnoreCase)
+            ? page is { } p ? PdfPagePath(storedPath, p) : null
+            : ext.Equals(".heic", StringComparison.OrdinalIgnoreCase) ? HeicPngPath(storedPath) : storedPath;
+        if (image is null)
         {
-            return page is { } p ? PdfPagePath(storedPath, p) : null;
+            return null;
         }
 
-        return ext.Equals(".heic", StringComparison.OrdinalIgnoreCase) ? HeicPngPath(storedPath) : storedPath;
+        return ImagePreprocessor.LatestOcrPath(image) ?? image;
     }
 
     public static string PdfPagePath(string pdfPath, int pageNumber) =>

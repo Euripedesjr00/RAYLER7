@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.Input;
 using Rayler7.App.Services;
 using Rayler7.Core.Audit;
 using Rayler7.Core.Extraction;
+using Rayler7.Core.Semantics;
 using Rayler7.Core.Mapping;
 using Rayler7.Core.Selection;
 using Rayler7.Infrastructure.Extraction;
@@ -432,6 +433,11 @@ public sealed partial class Stage2ViewModel : ObservableObject
         _cts = new CancellationTokenSource();
         var headers = sheet.Headers;
         var mappings = _ws.Mapping.Items.ToList();
+
+        // Linhas já existentes no modelo (abaixo do cabeçalho), para apontar dados repetidos.
+        var templateRows = sheet.Preview.Skip(sheet.HeaderRow ?? 0)
+            .Select(r => (IReadOnlyDictionary<int, string>)r.Select((v, i) => (v, i)).ToDictionary(x => x.i + 1, x => x.v.StartsWith('=') ? string.Empty : x.v))
+            .ToList();
         var sw = Stopwatch.StartNew();
         var processed = 0;
         try
@@ -473,6 +479,15 @@ public sealed partial class Stage2ViewModel : ObservableObject
                             warns.AddRange(built.Warnings);
                         }
 
+                        var previous = DuplicateDetector.RowsOf(Session.Records.Where(ReviewSession.IsEligible))
+                            .Select(g => (IReadOnlyDictionary<int, string>)g.Where(r => r.TargetColumn is not null)
+                                .GroupBy(r => ColumnLetters.ToIndex(r.TargetColumn!)).ToDictionary(x => x.Key, x => x.First().EffectiveText));
+                        var dup = DuplicateDetector.Flag(all, templateRows.Concat(previous));
+                        if (dup > 0)
+                        {
+                            warns.Insert(0, $"{dup} linha(s) repetida(s) — confira nas dúvidas");
+                        }
+
                         _store.Append(_ws.Project.Id, item.File.Id, all);
                         return (all, warns, output.PagesAnalyzed);
                     }, token);
@@ -492,9 +507,10 @@ public sealed partial class Stage2ViewModel : ObservableObject
                 {
                     SetFile(item, "fila", "Na fila", "Interrompido pelo usuário; pode ser reprocessado.");
                 }
-                catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException or FormatException or InvalidOperationException
-                                               or UglyToad.PdfPig.Core.PdfDocumentFormatException or DocumentFormat.OpenXml.Packaging.OpenXmlPackageException)
+                catch (Exception ex) when (ex is not OutOfMemoryException)
                 {
+                    // Um arquivo problemático nunca derruba o lote: fica marcado como falha e o resto continua.
+                    App.LogError(ex);
                     SetFile(item, "falha", "Falha", $"Falha (pode reprocessar): {ex.Message}");
                 }
 
@@ -545,7 +561,22 @@ public sealed partial class Stage2ViewModel : ObservableObject
     private void LeaveEmpty(DoubtRow row) => Decide(row, r => r.MarkLeaveEmpty(User, _ws.Project.Id, _services.Audit));
 
     [RelayCommand]
-    private void RejectDoubt(DoubtRow row) => Decide(row, r => r.Reject(User, _ws.Project.Id, _services.Audit, "Rejeitado na conferência"));
+    private void RejectDoubt(DoubtRow row)
+    {
+        // Linha repetida: rejeitar vale para a linha inteira, senão o resto dela iria para a planilha.
+        if (row.Record.Doubts.Any(d => d.Kind == DoubtKind.DuplicateRow))
+        {
+            foreach (var other in Session.Records.Where(r => r.Id != row.Record.Id && r.SourceFile == row.Record.SourceFile
+                                                             && r.Page == row.Record.Page && r.Row == row.Record.Row
+                                                             && r.Status != RecordStatus.Rejected))
+            {
+                other.Reject(User, _ws.Project.Id, _services.Audit, "Linha repetida rejeitada na conferência");
+                _store.UpdateState(other);
+            }
+        }
+
+        Decide(row, r => r.Reject(User, _ws.Project.Id, _services.Audit, "Rejeitado na conferência"));
+    }
 
     private void Decide(DoubtRow row, Action<ExtractedRecord> action)
     {

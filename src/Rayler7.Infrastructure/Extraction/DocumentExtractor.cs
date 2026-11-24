@@ -2,6 +2,7 @@ using System.Text;
 using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Packaging;
 using Rayler7.Core.Extraction;
+using Rayler7.Core.Semantics;
 using Rayler7.Infrastructure.Spreadsheets;
 using UglyToad.PdfPig;
 using W = DocumentFormat.OpenXml.Wordprocessing;
@@ -24,7 +25,7 @@ public sealed record ExtractionOutput(IReadOnlyList<SourceTable> Tables, IReadOn
 /// Lê arquivos DIGITAIS sem OCR: os textos saem exatamente como estão no arquivo.
 /// Matriz de suporte real (o que não está aqui não é anunciado como compatível).
 /// </summary>
-public static class DocumentExtractor
+public static partial class DocumentExtractor
 {
     private static readonly HashSet<string> Supported = new(StringComparer.OrdinalIgnoreCase) { ".xlsx", ".xlsm", ".xls", ".ods", ".csv", ".tsv", ".txt", ".docx", ".pdf", ".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff", ".webp", ".heic" };
     private static readonly HashSet<string> PendingOcr = new(StringComparer.OrdinalIgnoreCase);
@@ -103,6 +104,13 @@ public static class DocumentExtractor
     private static ExtractionOutput Delimited(string path, string name)
     {
         var (rows, delimiter, encoding) = CsvFile.Read(path);
+
+        // Arquivo de texto com fichas "Campo: Valor": lido linha a linha, sem cortar valores nas vírgulas.
+        if (FormText(name, File.ReadAllLines(path, encoding)) is { } form)
+        {
+            return new ExtractionOutput([form], [$"{name}: lido como ficha \"Campo: Valor\" (codificação {encoding.WebName})."], 0, 0);
+        }
+
         var cells = rows.Select(r => (IReadOnlyList<SourceCell>)r.Select(t => new SourceCell(t)).ToList()).ToList();
         var warn = $"{name}: separador \"{(delimiter == '\t' ? "tab" : delimiter.ToString())}\", codificação {encoding.WebName}.";
         return new ExtractionOutput([new SourceTable(name, null, null, cells, [])], [warn], 0, 0);
@@ -137,7 +145,7 @@ public static class DocumentExtractor
                             sb.Append('\n');
                         }
 
-                        sb.Append(p.InnerText);
+                        sb.Append(ParagraphText(p));
                     }
 
                     row.Add(new SourceCell(sb.ToString()));
@@ -149,13 +157,58 @@ public static class DocumentExtractor
             tables.Add(new SourceTable(name, null, $"Tabela {index}", rows, []));
         }
 
-        if (tables.Count == 0)
+        // Parágrafos fora de tabelas: aproveitados somente se forem fichas "Campo: Valor".
+        var lines = body.Elements<W.Paragraph>().Select(ParagraphText).ToList();
+        if (FormText(name, lines) is { } form)
         {
-            warnings.Add($"{name}: o documento não contém tabelas. Texto corrido não é convertido em dados automaticamente.");
+            tables.Add(form);
+        }
+        else if (tables.Count == 0)
+        {
+            warnings.Add($"{name}: o documento não contém tabelas nem fichas \"Campo: Valor\". Texto corrido não é convertido em dados automaticamente.");
         }
 
         return new ExtractionOutput(tables, warnings, 0, 0);
     }
+
+    /// <summary>Texto do parágrafo mantendo tabulações e quebras (InnerText as descarta e cola campos vizinhos).</summary>
+    private static string ParagraphText(W.Paragraph p)
+    {
+        var sb = new StringBuilder();
+        foreach (var el in p.Descendants())
+        {
+            switch (el)
+            {
+                case W.Text t:
+                    sb.Append(t.Text);
+                    break;
+                case W.TabChar:
+                    sb.Append('\t');
+                    break;
+                case W.Break or W.CarriageReturn:
+                    sb.Append('\n');
+                    break;
+            }
+        }
+
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// Linhas de texto como tabela (tabulação ou 3+ espaços separam campos na mesma linha); devolvida
+    /// somente quando o conteúdo é uma ficha "Campo: Valor" — texto corrido nunca vira dado.
+    /// </summary>
+    internal static SourceTable? FormText(string name, IEnumerable<string> lines)
+    {
+        var rows = lines.Select(l => (IReadOnlyList<SourceCell>)WideGap().Split(l.TrimEnd('\r'))
+                .Where(part => part.Length > 0).Select(part => new SourceCell(part.Trim())).ToList())
+            .ToList();
+        var table = new SourceTable(name, null, "Texto", rows, []);
+        return KeyValueForms.TryConvert(table) is null ? null : table;
+    }
+
+    [System.Text.RegularExpressions.GeneratedRegex(@"\t|\s{3,}")]
+    private static partial System.Text.RegularExpressions.Regex WideGap();
 
     /// <summary>
     /// PDF com texto digital: reconstrói linhas pela posição vertical das palavras e células pelos

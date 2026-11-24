@@ -12,7 +12,7 @@ public sealed record RecentProjectItem(ProjectInfo Project, string Details);
 
 public sealed partial class CoverViewModel
 {
-    public const string TemplateFilter = "Planilhas suportadas (*.xlsx;*.xlsm;*.csv;*.tsv;*.txt)|*.xlsx;*.xlsm;*.csv;*.tsv;*.txt|Todos os arquivos (*.*)|*.*";
+    public const string TemplateFilter = "Modelos suportados|*.xlsx;*.xlsm;*.xls;*.ods;*.csv;*.tsv;*.txt;*.docx;*.pdf;*.jpg;*.jpeg;*.png;*.bmp;*.tif;*.tiff;*.webp;*.heic|Planilhas (*.xlsx;*.xlsm;*.xls;*.ods;*.csv)|*.xlsx;*.xlsm;*.xls;*.ods;*.csv|Documentos e fotos (*.pdf;*.docx;*.jpg;*.png)|*.pdf;*.docx;*.jpg;*.jpeg;*.png;*.bmp;*.tif;*.tiff;*.webp;*.heic|Todos os arquivos (*.*)|*.*";
 
     private readonly AppServices _services;
     private readonly IDialogs _dialogs;
@@ -58,18 +58,12 @@ public sealed partial class CoverViewModel
             return;
         }
 
-        try
+        // Cria o projeto e entrega à Etapa 1, que analisa (ou converte) o modelo e mostra o resultado.
+        var p = _services.Projects.Create(Path.GetFileNameWithoutExtension(path), _services.CurrentUser.Username);
+        _main.OpenWorkspace(new ProjectWorkspace(p));
+        if (_main.CurrentPage is Stage1ViewModel stage1)
         {
-            var analysis = SpreadsheetAnalyzer.Analyze(path);
-            var p = _services.Projects.Create(Path.GetFileNameWithoutExtension(path), _services.CurrentUser.Username);
-            var file = _services.Projects.ImportFile(p, path, ProjectService.RoleTemplate);
-            var ws = new ProjectWorkspace(p) { TemplateFile = file, TemplateAnalysis = analysis };
-            _main.OpenWorkspace(ws);
-            _main.Status($"Modelo carregado: {file.OriginalName}");
-        }
-        catch (Exception ex) when (ex is NotSupportedException or IOException or InvalidDataException or UnauthorizedAccessException)
-        {
-            _dialogs.Info(ex.Message, "Não foi possível abrir a planilha");
+            stage1.LoadTemplate(path);
         }
     }
 }

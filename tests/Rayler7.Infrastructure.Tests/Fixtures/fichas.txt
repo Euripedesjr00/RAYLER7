@@ -1,0 +1,7 @@
+Nome: Maria Souza
+Placa: ABC-1234
+Observação: chuva, vento forte
+
+Nome: João Lima
+Placa: XYZ-9876
+Observação: sem ocorrências
