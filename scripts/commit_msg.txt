@@ -1,12 +1,11 @@
-Etapa 3 (formatacao e exportacao) e instalador Windows
+RAYLER7 1.0.0: PDF digitalizado, .xls, .ods, HEIC e exportacao ODS
 
-- 7 modelos de aparencia + manter original, cores personalizadas e previa
-- CONFIRMAR FORMATACAO antes do Excel; conferencia celula por celula impede alterar valores
-- Exportacao: Excel, CSV, TSV, TXT, JSON, DBF e pacotes R/SPSS/Stata/SAS (tudo como texto)
-- Mensagem final "Criado por Jhon" so aparece depois do arquivo gravado
-- Instalador Inno Setup por usuario, autocontido, com icone, atalhos e desinstalacao
-- Script que testa instalar, abrir, desinstalar e reinstalar
-- 120 testes automatizados aprovados
+- Paginas de PDF sem texto sao renderizadas pelo Windows e lidas pelos dois motores de OCR
+- Leitura de .xls (formato de exibicao de cada celula) e .ods (texto exibido, sem reformatar)
+- Fotos HEIC convertidas pelo decodificador do Windows
+- Exportacao nativa para LibreOffice (.ods) com todas as abas
+- Recortes de conferencia tambem para paginas de PDF digitalizado
+- Instalador 1.0.0 e notas da versao; script do instalador funciona no GitHub Actions
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01MYFPrFXy4xzXfnS4QkZVoH

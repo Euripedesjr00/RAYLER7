@@ -26,9 +26,9 @@ public sealed record ExtractionOutput(IReadOnlyList<SourceTable> Tables, IReadOn
 /// </summary>
 public static class DocumentExtractor
 {
-    private static readonly HashSet<string> Supported = new(StringComparer.OrdinalIgnoreCase) { ".xlsx", ".xlsm", ".csv", ".tsv", ".txt", ".docx", ".pdf", ".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff", ".webp" };
-    private static readonly HashSet<string> PendingOcr = new(StringComparer.OrdinalIgnoreCase) { ".heic" };
-    private static readonly HashSet<string> PendingOther = new(StringComparer.OrdinalIgnoreCase) { ".xls", ".ods", ".doc", ".rtf" };
+    private static readonly HashSet<string> Supported = new(StringComparer.OrdinalIgnoreCase) { ".xlsx", ".xlsm", ".xls", ".ods", ".csv", ".tsv", ".txt", ".docx", ".pdf", ".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff", ".webp", ".heic" };
+    private static readonly HashSet<string> PendingOcr = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly HashSet<string> PendingOther = new(StringComparer.OrdinalIgnoreCase) { ".doc", ".rtf" };
 
     public static SupportLevel Support(string path)
     {
@@ -41,7 +41,7 @@ public static class DocumentExtractor
     public static string PendingReason(string path) =>
         PendingOcr.Contains(Path.GetExtension(path))
             ? "HEIC ainda não é lido. Converta a foto para JPG ou PNG (no celular ou no app Fotos) e envie de novo."
-            : $"O formato {Path.GetExtension(path)} ainda não está implementado. Salve como .xlsx/.docx e envie novamente.";
+            : $"O formato {Path.GetExtension(path)} não é lido diretamente. No Word, use Arquivo > Salvar como > Documento do Word (.docx) e envie novamente.";
 
     public static ExtractionOutput Extract(string path, string displayName, CancellationToken ct = default)
     {
@@ -49,6 +49,9 @@ public static class DocumentExtractor
         return ext switch
         {
             ".XLSX" or ".XLSM" => Excel(path, displayName, ct),
+            ".XLS" => LegacySpreadsheets.Xls(path, displayName, ct),
+            ".ODS" => LegacySpreadsheets.Ods(path, displayName, ct),
+            ".HEIC" => ImageExtractor.Extract(PageImages.ConvertHeicAsync(path).GetAwaiter().GetResult(), displayName, ct),
             ".CSV" or ".TSV" or ".TXT" => Delimited(path, displayName),
             ".DOCX" => Word(path, displayName),
             ".PDF" => Pdf(path, displayName, ct),
@@ -156,7 +159,7 @@ public static class DocumentExtractor
 
     /// <summary>
     /// PDF com texto digital: reconstrói linhas pela posição vertical das palavras e células pelos
-    /// espaços horizontais. PDFs digitalizados (só imagem) ficam para o OCR.
+    /// espaços horizontais. Páginas digitalizadas (só imagem) são lidas por OCR.
     /// </summary>
     private static ExtractionOutput Pdf(string path, string name, CancellationToken ct)
     {
@@ -173,6 +176,7 @@ public static class DocumentExtractor
             if (words.Count == 0)
             {
                 scanned++;
+                OcrPage(path, name, page.Number, tables, warnings, ct);
                 continue;
             }
 
@@ -225,9 +229,34 @@ public static class DocumentExtractor
 
         if (scanned > 0)
         {
-            warnings.Add($"{name}: {scanned} página(s) sem texto digital (digitalizadas). Exporte essas páginas como imagem (PNG/JPG) e envie as imagens: elas serão lidas por OCR.");
+            warnings.Add($"{name}: {scanned} página(s) digitalizada(s) lida(s) por OCR — confira os valores com a imagem da página.");
         }
 
-        return new ExtractionOutput(tables, warnings, pages, 0);
+        return new ExtractionOutput(tables, warnings, pages, scanned);
+    }
+
+    /// <summary>Página sem texto digital: o Windows renderiza a página e os dois motores de OCR a leem.</summary>
+    private static void OcrPage(string path, string name, int pageNumber, List<SourceTable> tables, List<string> warnings, CancellationToken ct)
+    {
+        try
+        {
+            var png = PageImages.RenderPdfPageAsync(path, pageNumber).GetAwaiter().GetResult();
+            ct.ThrowIfCancellationRequested();
+            var ocr = ImageExtractor.Extract(png, name, ct);
+            foreach (var t in ocr.Tables)
+            {
+                tables.Add(t with { Page = pageNumber, Label = $"Página {pageNumber} (OCR)" });
+            }
+
+            warnings.AddRange(ocr.Warnings.Select(w => w.Replace($"{name}:", $"{name} pág. {pageNumber}:", StringComparison.Ordinal)).Distinct());
+        }
+        catch (InvalidDataException)
+        {
+            warnings.Add($"{name} pág. {pageNumber}: nenhum texto reconhecido na página digitalizada.");
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.Runtime.InteropServices.COMException or ArgumentException)
+        {
+            warnings.Add($"{name} pág. {pageNumber}: não foi possível renderizar a página para OCR ({ex.Message}).");
+        }
     }
 }

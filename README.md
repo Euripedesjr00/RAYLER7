@@ -13,16 +13,17 @@ Funciona 100% local, sem internet e sem serviços pagos de IA.
 | Login local (Argon2id, bloqueio progressivo, sem senha universal) | ✅ Implementado |
 | Projetos salvos localmente e "Continuar projeto" | ✅ Implementado |
 | Etapa 1 — planilha-modelo (.xlsx, .xlsm, .csv, .tsv, .txt), instruções e mapeamento | ✅ Implementado |
-| Etapa 2 — extração de Excel, CSV/TXT, Word (tabelas) e PDF com texto digital | ✅ Implementado |
+| Etapa 2 — extração de Excel (.xlsx, .xlsm, .xls), LibreOffice (.ods), CSV/TSV/TXT, Word (tabelas) e PDF digital | ✅ Implementado |
+| Etapa 2 — PDF digitalizado: cada página sem texto é renderizada pelo Windows e lida por OCR | ✅ Implementado |
 | Etapa 2 — botão **Selecionar todos os dados** (todas as páginas) e conferência de dúvidas | ✅ Implementado |
 | Etapa 2 — geração da planilha preenchida (cópia; o modelo não é alterado) | ✅ Implementado |
-| OCR de fotos (.jpg, .png, .bmp, .tif, .webp) com dois motores gratuitos (Tesseract + OCR do Windows) | ✅ Implementado |
+| OCR de fotos (.jpg, .png, .bmp, .tif, .webp, .heic) com dois motores gratuitos (Tesseract + OCR do Windows) | ✅ Implementado |
 | Etapa 3 — 7 modelos de aparência + manter original, prévia e **Confirmar formatação** | ✅ Implementado |
-| Etapa 3 — exportação: Excel, CSV (; e ,), TSV, TXT, JSON, DBF e pacotes para R, SPSS, Stata e SAS | ✅ Implementado |
+| Etapa 3 — exportação: Excel, LibreOffice (.ods), CSV (; e ,), TSV, TXT, JSON, DBF e pacotes para R, SPSS, Stata e SAS | ✅ Implementado |
 | Mensagem final "Criado por Jhon" só depois de uma exportação concluída | ✅ Implementado |
 | Instalador Windows por usuário (sem senha de administrador, sem instalar .NET à parte) | ✅ Implementado |
-| PDF digitalizado (imagem), .heic, .xls, .ods, .doc, .rtf | ⏳ Pendente |
-| Exportação ODS, PDF e arquivos nativos .sav / .dta | ⏳ Pendente |
+| Leitura de .doc e .rtf (salve como .docx) | ⏳ Pendente |
+| Exportação em PDF e arquivos nativos .sav / .dta | ⏳ Pendente |
 | Módulos científicos e estatísticos do prompt mestre | ⏳ Pendente |
 
 Os pacotes de R, SPSS, Stata e SAS são um `.zip` com os dados em CSV UTF-8, dicionário de dados e
@@ -37,9 +38,11 @@ Cada valor guarda três camadas separadas: **original** (imutável), **interpret
 cálculo) e **corrigido** (somente com autorização, registrada no histórico). `12,50` continua
 `12,50`; `001` continua `001`; separadores ambíguos como `1.234` viram dúvida para o usuário decidir.
 
-## Instalar
+## Baixar e instalar
 
-Baixe `RAYLER7_Instalador_0.1.0.exe` e execute. A instalação é só para o seu usuário
+**[⬇ Baixar a versão mais recente](https://github.com/Euripedesjr00/RAYLER7/releases/latest)** — arquivo `RAYLER7_Instalador_1.0.0.exe`.
+
+Execute o instalador. A instalação é só para o seu usuário
 (`%LOCALAPPDATA%\Programs\RAYLER7`), cria atalho no Menu Iniciar (e, se quiser, na área de trabalho)
 e aparece em "Aplicativos instalados" para desinstalar. Desinstalar **não apaga** seus projetos.
 

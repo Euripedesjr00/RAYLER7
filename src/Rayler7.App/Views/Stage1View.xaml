@@ -36,7 +36,7 @@
                         <StackPanel>
                             <TextBlock Text="Arquivo da planilha-modelo" Style="{StaticResource H2}" />
                             <TextBlock Style="{StaticResource Muted}" Margin="0,4,0,0" MaxWidth="560" HorizontalAlignment="Left"
-                                       Text="Formatos implementados: Excel (.xlsx, .xlsm), CSV, TSV e TXT delimitado. Pendentes: .xls, .ods, PDF e imagens como modelo." />
+                                       Text="Modelo em Excel (.xlsx, .xlsm), CSV, TSV ou TXT delimitado. Se o modelo estiver em .xls ou .ods, abra no Excel ou LibreOffice e salve como .xlsx antes de enviar." />
                         </StackPanel>
                     </DockPanel>
 

@@ -8,6 +8,7 @@ namespace Rayler7.Infrastructure.Export;
 public enum ExportFormat
 {
     Xlsx,
+    Ods,
     CsvUtf8Semicolon,
     CsvUtf8Comma,
     Tsv,
@@ -28,6 +29,7 @@ public static class Exporters
     public static readonly IReadOnlyList<ExportFormatInfo> Formats =
     [
         new(ExportFormat.Xlsx, "Excel (.xlsx)", ".xlsx", true, "Com a aparência escolhida; fórmulas, mesclagens e abas do modelo preservadas."),
+        new(ExportFormat.Ods, "LibreOffice (.ods)", ".ods", true, "Planilha OpenDocument com todas as abas; valores gravados como texto exato."),
         new(ExportFormat.CsvUtf8Semicolon, "CSV UTF-8 (;)", ".csv", true, "Padrão do Excel em português. Todos os valores como texto exato."),
         new(ExportFormat.CsvUtf8Comma, "CSV UTF-8 (,)", ".csv", true, "Padrão internacional. Valores com vírgula decimal ficam entre aspas."),
         new(ExportFormat.Tsv, "TSV (tabulação)", ".tsv", true, "Separado por tabulação; abre em R, Jamovi, JASP e LibreOffice."),
@@ -65,6 +67,9 @@ public static class Exporters
             case ExportFormat.Tsv:
             case ExportFormat.Txt:
                 CsvFile.Write(outputPath, Rows(sheet), '\t');
+                break;
+            case ExportFormat.Ods:
+                OdsWriter.Write(outputPath, sheets);
                 break;
             case ExportFormat.Json:
                 WriteJson(sheets, outputPath);

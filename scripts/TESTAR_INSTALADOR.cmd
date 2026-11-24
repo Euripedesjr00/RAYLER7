@@ -3,7 +3,7 @@ chcp 65001 >nul
 cd /d "%~dp0.."
 if not exist logs mkdir logs
 set L=logs\teste_instalacao.txt
-set SETUP=artifacts\instalador\RAYLER7_Instalador_0.1.0.exe
+set SETUP=artifacts\instalador\RAYLER7_Instalador_1.0.0.exe
 set APPDIR=%LOCALAPPDATA%\Programs\RAYLER7
 set PSX=powershell -NoProfile -Command
 echo === %date% %time% === > %L%

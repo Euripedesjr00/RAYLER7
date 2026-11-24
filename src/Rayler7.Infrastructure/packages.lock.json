@@ -24,6 +24,18 @@
           "DocumentFormat.OpenXml.Framework": "3.5.1"
         }
       },
+      "ExcelDataReader": {
+        "type": "Direct",
+        "requested": "[3.7.*, )",
+        "resolved": "3.7.0",
+        "contentHash": "AMv3oDETRHSRyXC17rBtKH45qIfFyo433LMeaMB3u4RNr/c9Luuc0Z+JMP6+3Cx9n4wXqFqcrEIVxrf/GgYnZg=="
+      },
+      "ExcelNumberFormat": {
+        "type": "Direct",
+        "requested": "[1.1.*, )",
+        "resolved": "1.1.0",
+        "contentHash": "R3BVHPs9O+RkExbZYTGT0+9HLbi8ZrNij1Yziyw6znd3J7P3uoIR07uwTLGOogtz1p6+0sna66eBoXu7tBiVQA=="
+      },
       "Konscious.Security.Cryptography.Argon2": {
         "type": "Direct",
         "requested": "[1.3.*, )",
@@ -74,11 +86,6 @@
         "dependencies": {
           "System.IO.Packaging": "10.0.2"
         }
-      },
-      "ExcelNumberFormat": {
-        "type": "Transitive",
-        "resolved": "1.1.0",
-        "contentHash": "R3BVHPs9O+RkExbZYTGT0+9HLbi8ZrNij1Yziyw6znd3J7P3uoIR07uwTLGOogtz1p6+0sna66eBoXu7tBiVQA=="
       },
       "Konscious.Security.Cryptography.Blake2": {
         "type": "Transitive",

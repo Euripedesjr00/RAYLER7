@@ -33,7 +33,7 @@
                         <StackPanel>
                             <TextBlock Text="Arquivos de origem dos dados" Style="{StaticResource H2}" />
                             <TextBlock Style="{StaticResource Muted}" Margin="0,4,0,0" MaxWidth="640" HorizontalAlignment="Left"
-                                       Text="Implementado: Excel (.xlsx, .xlsm), CSV, TSV, TXT, Word (.docx), PDF com texto digital e fotos/imagens (JPG, PNG, BMP, TIFF, WEBP) via OCR gratuito local. Manuscritos são lidos com baixa precisão: confira sempre." />
+                                       Text="Lê Excel (.xlsx, .xlsm, .xls), LibreOffice (.ods), CSV, TSV, TXT, Word (.docx), PDF (digital ou digitalizado) e fotos (JPG, PNG, BMP, TIFF, WEBP, HEIC) com OCR gratuito local. Manuscritos são lidos com baixa precisão: confira sempre. Arquivos .doc e .rtf: salve como .docx no Word." />
                         </StackPanel>
                     </DockPanel>
 

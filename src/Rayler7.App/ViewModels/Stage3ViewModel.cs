@@ -202,6 +202,14 @@ public sealed partial class Stage3ViewModel : ObservableObject
             else
             {
                 var sheets = AllSheets ? _sheets : [_sheets[0]];
+                if (format is ExportFormat.Ods or ExportFormat.Json)
+                {
+                    // Formatos com várias abas num único arquivo.
+                    Exporters.Write(format, sheets, target);
+                    written.Add(target);
+                    sheets = [];
+                }
+
                 for (var i = 0; i < sheets.Count; i++)
                 {
                     var path = i == 0 ? target : Path.Combine(Path.GetDirectoryName(target)!, $"{Path.GetFileNameWithoutExtension(target)}_{Safe(sheets[i].Name)}{info.Extension}");

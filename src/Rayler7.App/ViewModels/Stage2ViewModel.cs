@@ -93,7 +93,7 @@ public sealed partial class DoubtRow(ExtractedRecord record, System.Windows.Medi
 public sealed partial class Stage2ViewModel : ObservableObject
 {
     public const int PageSize = 100;
-    private const string SourceFilter = "Arquivos de dados|*.xlsx;*.xlsm;*.csv;*.tsv;*.txt;*.docx;*.pdf;*.jpg;*.jpeg;*.png;*.bmp;*.webp;*.tif;*.tiff|Todos os arquivos (*.*)|*.*";
+    private const string SourceFilter = "Arquivos de dados|*.xlsx;*.xlsm;*.xls;*.ods;*.csv;*.tsv;*.txt;*.docx;*.pdf;*.jpg;*.jpeg;*.png;*.bmp;*.webp;*.tif;*.tiff;*.heic|Todos os arquivos (*.*)|*.*";
     private readonly AppServices _services;
     private readonly IDialogs _dialogs;
     private readonly MainViewModel _main;
@@ -643,7 +643,7 @@ public sealed partial class Stage2ViewModel : ObservableObject
         DoubtRows.Clear();
         foreach (var r in Session.Records.Where(r => r.HasOpenDoubt).Take(200))
         {
-            DoubtRows.Add(new DoubtRow(r, ImageCrops.Crop(_sourcePathByRecord.GetValueOrDefault(r.Id), r.Box)));
+            DoubtRows.Add(new DoubtRow(r, ImageCrops.Crop(_sourcePathByRecord.GetValueOrDefault(r.Id) is { } src ? PageImages.PreviewPath(src, r.Page) : null, r.Box)));
         }
 
         RefreshCounters();
